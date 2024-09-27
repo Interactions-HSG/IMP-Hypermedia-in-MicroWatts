@@ -1,7 +1,7 @@
 # IMP-Hypermedia-in-MicroWatts
 
 
-![drawio image](images/layout.drawio.png)
+![drawio image](documentation/images/layout.drawio.png)
 
 ## ROADMAP
 The rough steps to make this project a success

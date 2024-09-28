@@ -10,4 +10,24 @@ services:
       - YGGDRASIL_VERSION=0.0.0
     ports:
       - "8899:8080"
+    networks:
+      - smart-buidling
     restart: always
+
+  AutomationAgent:
+    image: automationagent:latest
+    build:
+      context: ./AutomationAgent
+    container_name: automationAgent
+    environment:
+      - AUTOMATION_AGENT_VERSION=0.0.0
+      - YGGDRASIL_URL=http://yggdrasil:8080
+    ports:
+      - "8898:8081"
+    networks:
+      - smart-buidling
+    restart: always
+
+networks:
+    smart-buidling:
+        driver: bridge

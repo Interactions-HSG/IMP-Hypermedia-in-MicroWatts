@@ -11,7 +11,9 @@
 +!start : true
     <- .print("hello world.");
        .date(Y,M,D); .time(H,Min,Sec,MilSec); // get current date & time
-       +started(Y,M,D,H,Min,Sec).             // add a new belief
+       +started(Y,M,D,H,Min,Sec);             // add a new belief
+       readEndpoint(Response).
+
 
 { include("$jacamo/templates/common-cartago.asl") }
 { include("$jacamo/templates/common-moise.asl") }

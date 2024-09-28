@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   yggdrasil:
     image: yggdrasil:latest
@@ -9,7 +7,7 @@ services:
     environment:
       - YGGDRASIL_VERSION=0.0.0
     ports:
-      - "8899:8080"
+      - "8080:8080"
     networks:
       - smart-buidling
     restart: always
@@ -26,7 +24,7 @@ services:
       - "8898:8081"
     networks:
       - smart-buidling
-    restart: always
+    restart: on-failure
 
 networks:
     smart-buidling:

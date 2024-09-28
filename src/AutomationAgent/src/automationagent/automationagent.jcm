@@ -19,9 +19,6 @@ mas automationagent {
     }
 
     workspace w {
-      artifact c1: example.Counter(3) 
+      artifact c1: HttpClientArtifact() 
     }
-
-    
-
 }

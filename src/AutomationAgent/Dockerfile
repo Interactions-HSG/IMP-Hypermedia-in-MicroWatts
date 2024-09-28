@@ -1,8 +1,5 @@
 FROM eclipse-temurin:21
 
-# AutomationAgent build configuration
-ENV AUTOMATION_AGENT_VERSION 0.0.0
-
 # Build environment preparation
 ENV LANG C.UTF-8
 
@@ -19,6 +16,6 @@ WORKDIR /opt/src/automationagent
 EXPOSE 8081
 
 # Set the entrypoint to run gradlew
-# ENTRYPOINT ["./gradlew"]
-# CMD ["-q", "--console=plain"]
+ENTRYPOINT ["./gradlew"]
+CMD ["-q", "--console=plain"]
 # We can also just start it from inside the container

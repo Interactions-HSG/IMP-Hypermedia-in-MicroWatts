@@ -12,6 +12,15 @@ services:
     networks:
       - imp_network
 
+  db:
+    build:
+      context: ./DB
+    container_name: db
+    ports:
+      - "5684:5683/udp"
+    networks:
+      - imp_network
+
   yggdrasil:
     image: yggdrasil:latest
     build:

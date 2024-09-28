@@ -112,9 +112,9 @@ public class TestClient extends Thread {
 
 */
             //Query role player
-            //client.setURI("coap://localhost:5683/room1/gr_comfort_sensing/ag1");
-            //response = client.get().getResponseText();
-            //System.out.println("Get ag1: " + response);
+            client.setURI("coap://localhost:5683/room1/gr_comfort_sensing/ag1");
+            response = client.get().getResponseText();
+            System.out.println("Get ag1: " + response);
 
             //Delete agent as role player
             //response = client.delete().getCode().toString();

@@ -1,6 +1,17 @@
 version: '3.9'
 
 services:
+  organization_manager:
+    build:
+      context: ./OrgManager
+    container_name: organization_manager
+    #    environment:
+    ports:
+      - "5683:5683/udp"
+    restart: always
+    networks:
+      - imp_network
+
   yggdrasil:
     image: yggdrasil:latest
     build:
@@ -11,3 +22,12 @@ services:
     ports:
       - "8899:8080"
     restart: always
+    networks:
+      - imp_network
+
+
+networks:
+  imp_network:
+    name: imp_network
+    driver: bridge
+

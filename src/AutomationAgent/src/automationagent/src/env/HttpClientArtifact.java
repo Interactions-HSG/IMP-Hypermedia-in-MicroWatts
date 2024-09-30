@@ -38,8 +38,8 @@ public class HttpClientArtifact extends Artifact{
                     System.out.println("Error: " + response.statusCode());
                 }
                 String responseBody = response.body();
-                System.out.println(responseBody);
-  
+                result.set(responseBody);
+
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -50,5 +50,10 @@ public class HttpClientArtifact extends Artifact{
         }
 
     }
-    
+
+    @OPERATION
+    public void readTD(String response, OpFeedbackParam<String> result) {
+        System.out.println("TD: " + response);
+    }
+
 }

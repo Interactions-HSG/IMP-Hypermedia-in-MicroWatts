@@ -9,6 +9,9 @@ import java.net.http.HttpResponse;
 import cartago.Artifact;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
+import ch.unisg.ics.interactions.wot.td.ThingDescription;
+import ch.unisg.ics.interactions.wot.td.ThingDescription.TDFormat;
+import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 
 
 
@@ -54,6 +57,7 @@ public class HttpClientArtifact extends Artifact{
     @OPERATION
     public void readTD(String response, OpFeedbackParam<String> result) {
         System.out.println("TD: " + response);
+        ThingDescription td = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, response);
     }
 
 }

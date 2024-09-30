@@ -8,6 +8,7 @@ public class CoAPClientArtifact extends Artifact{
 
     @OPERATION
     public void sendCoAPRequest(final String to, OpFeedbackParam<String> response) {
+        
 
 
     }

@@ -21,6 +21,11 @@ The rough steps to make this project a success
 - [ ] Functionality shoud be same as over HTTP
 - [ ] Add functionality to expand #platform representation so that e.g. orgManager is easily found
 
+### Yggdrasil Roadblocks
+- [ ] What to do with base uri ? If coAP agent disregards base Uri and just uses the paths it works. 
+But that would mean that the agent cannot take the actual uris advertised in the representations.
+- [ ] How should request payloads look like? /join uses http headers
+- [ ] Should we add another representation factory that gives tds specifically for coap?
 
 
 ### loose ideas

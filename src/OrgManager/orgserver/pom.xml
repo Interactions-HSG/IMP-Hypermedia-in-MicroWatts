@@ -12,6 +12,12 @@
 	<name>orgserver</name>
 	<description>Moise organization server with CoAP interface</description>
 
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.eclipse.californium/element-connector-tcp-netty -->
@@ -37,14 +43,33 @@
 		</dependency>
 
 		<dependency>
-    <groupId>org.jacamo</groupId>
-    <artifactId>moise</artifactId>
-    <version>1.0</version>
-    <scope>system</scope>
-    <systemPath>${project.basedir}/libs/moise-1.1-SNAPSHOT.jar</systemPath>
-</dependency>
+			<groupId>org.jacamo</groupId>
+			<artifactId>moise</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/moise-1.1-SNAPSHOT.jar</systemPath>
+		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-model -->
+		<dependency>
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-model</artifactId>
+			<version>5.0.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-rio-turtle -->
+		<dependency>
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-rio-turtle</artifactId>
+			<version>5.0.1</version>
+		</dependency>
+		<dependency>
+	    <groupId>com.github.Interactions-HSG</groupId>
+	    <artifactId>wot-td-java</artifactId>
+	    <version>master-SNAPSHOT</version>
+	</dependency>
 	</dependencies>
+
 
 	<build>
 		<plugins>

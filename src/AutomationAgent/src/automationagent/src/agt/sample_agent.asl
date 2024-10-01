@@ -1,6 +1,7 @@
 // Agent sample_agent in project automationagent
 
 /* Initial beliefs and rules */
+entrypoint("http://localhost:8080/").
 
 /* Initial goals */
 
@@ -15,10 +16,14 @@
        !findOrganisation.
 
 
-+!findOrganisation : true <- 
-       .print("test");
-       readEndpoint(Response);
-       readTD(Response, Result).
++!findOrganisation : entrypoint(URI) <- 
+       .print("Finding organisation");
+       readEndpoint(URI, EntrypointRepresentation);
+       .print("Read entrypoint, checking out root workspace");
+       getWorkspace("root",EntrypointRepresentation, RootWorkspaceUri);
+       readEndpoint(RootWorkspaceUri, RootWorkspaceRepresentation);
+       .print("Found root workspace, joining Organisation");
+       joinOrganisationInWorkspace(RootWorkspaceRepresentation).
 
 
 { include("$jacamo/templates/common-cartago.asl") }

@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+
 import cartago.Artifact;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
@@ -13,18 +14,20 @@ import ch.unisg.ics.interactions.wot.td.ThingDescription;
 import ch.unisg.ics.interactions.wot.td.ThingDescription.TDFormat;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 
+import static org.eclipse.rdf4j.model.util.Values.iri;
+
 
 
 public class HttpClientArtifact extends Artifact{
 
-    private static String ENTRYPOINT = "http://yggdrasil:8080/";
+    private static String ENTRYPOINT = "http://localhost:8080/";
 
     void init(){}
 
     @OPERATION
-    public void readEndpoint(OpFeedbackParam<String> result) {
+    public void readEndpoint(String resourceUri, OpFeedbackParam<String> result) {
         try {
-            URI uri = new URI(ENTRYPOINT);
+            URI uri = new URI(resourceUri);
 
             HttpRequest request = HttpRequest.newBuilder()
             .uri(uri)
@@ -55,9 +58,30 @@ public class HttpClientArtifact extends Artifact{
     }
 
     @OPERATION
-    public void readTD(String response, OpFeedbackParam<String> result) {
-        System.out.println("TD: " + response);
-        ThingDescription td = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, response);
+    public void getWorkspace(String workspaceName, String entrypointTDString, OpFeedbackParam<String> result) {
+        ThingDescription td = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, entrypointTDString);
+        final var expectedWorkspaceURI = ENTRYPOINT + "workspaces/" + workspaceName +"/#workspace";
+        final var foundWorkspace = findWorkspace(td, workspaceName, expectedWorkspaceURI);
+        System.out.println(foundWorkspace);
+        final var workspaceUri = ENTRYPOINT + "workspaces/" + workspaceName;
+        result.set(workspaceUri);
+
+    }
+
+
+    public boolean findWorkspace(ThingDescription td, final String workspaceName, final String expectedWorkspaceURI) {
+        final var model = td.getGraph().get();
+        final var t = model.filter(null, iri("https://purl.org/hmas/hosts"), iri(expectedWorkspaceURI));
+        return t.size() > 0;
+    }
+
+    @OPERATION
+    public void joinOrganisationInWorkspace(final String workspaceRepresenation){
+        final var model = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, workspaceRepresenation).getGraph().get();
+        final var artifactsInWorkspace = model.filter(null, iri("https://purl.org/hmas/contains"),null);
+        if (artifactsInWorkspace.isEmpty()) {
+           System.out.println("No org artifact present");
+        }
     }
 
 }

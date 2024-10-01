@@ -13,6 +13,12 @@
     "enabled" : true
   },
   "environment-config" : {
-    "enabled" : true
+    "enabled" : true,
+    "ontology" : "td",
+    "workspaces" : [
+      {
+        "name" : "root"
+      }
+    ]
   }
 }

@@ -2,7 +2,7 @@
   "http-config" : {
     "host" : "0.0.0.0",
     "port" : 8080,
-    "base-uri" : "http://localhost:8899/"
+    "base-uri" : "http://yggdrasil:8080/"
   },
   "rdf-store" : {
     "in-memory" : false,

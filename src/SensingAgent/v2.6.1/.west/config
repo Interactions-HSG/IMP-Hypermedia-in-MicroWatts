@@ -1,0 +1,6 @@
+[manifest]
+path = nrf
+file = west.yml
+
+[zephyr]
+base = zephyr

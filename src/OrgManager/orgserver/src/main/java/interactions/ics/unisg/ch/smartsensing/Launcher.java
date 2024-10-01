@@ -35,8 +35,8 @@ public class Launcher {
 			}
 			
 			System.out.printf("Intializing OrgServer from %s\n", fileName);
-			//MoiseOrgServer server = new MoiseOrgServer(udp, tcp, port);
-			AGRServer server = new AGRServer(udp, tcp, port);
+			MoiseOrgServer server = new MoiseOrgServer(udp, tcp, port);
+			//AGRServer server = new AGRServer(udp, tcp, port);
 			//server.addEndpoints(udp, tcp, port);
 			server.start();
 			TestClient.createDemoRole();

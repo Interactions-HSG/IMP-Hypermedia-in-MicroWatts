@@ -11,7 +11,7 @@ RUN mkdir /opt/app
 COPY yggdrasil-${YGGDRASIL_VERSION}-SNAPSHOT-all.jar /opt/app
 # Copy the configuration
 RUN mkdir /opt/app/conf
-COPY conf/docker_disk_config.json /opt/app/conf/docker_config.json
+COPY conf/docker_config.json /opt/app/conf/docker_config.json
 
 # The default http port
 EXPOSE 8080

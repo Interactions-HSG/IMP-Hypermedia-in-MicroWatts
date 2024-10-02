@@ -18,21 +18,21 @@ import org.eclipse.californium.elements.exception.ConnectorException;
 public class SensingAgent extends CoapServer {
 
   private final String ENTRYPOINT;
-  private final String metadata;
+  private String metadata;
 
   private boolean running = false;
   private CoapClient coapClient;
 
   public SensingAgent(String entrypoint) throws IOException {
+    super(5685);
     this.ENTRYPOINT = entrypoint;
-    this.metadata = getRepresentation();
   }
 
   public void run() throws ConnectorException, IOException {
     this.start();
-    getRepresentation();
+    this.metadata = getRepresentation();
     //running = true;
-    // final var foundDB = findDB();
+    final var foundDB = findDB();
     while (running) {
       System.out.println("Sensing...");
       sendSensingData();
@@ -42,15 +42,18 @@ public class SensingAgent extends CoapServer {
         e.printStackTrace();
       }
     }
+    this.stop();
+    this.destroy();
   }
 
-  public void stop() {
+  public void stopRunning() {
     running = false;
   }
 
   private boolean findDB() throws ConnectorException, IOException {
     coapClient = new CoapClient(ENTRYPOINT);
     final String platformRepresentation = coapClient.get().getResponseText();
+    System.out.println("Platform found: " + platformRepresentation);
     final String rootWorkspaceUri = getWorkspaceUri("root", platformRepresentation);
     if (rootWorkspaceUri == null) {
       System.out.println("DB not found");

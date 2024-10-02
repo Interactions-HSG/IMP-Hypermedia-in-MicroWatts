@@ -13,6 +13,7 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -24,6 +25,11 @@ dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
     implementation(libs.californium)
+    implementation("com.github.Interactions-HSG:wot-td-java:master-SNAPSHOT")
+    implementation("org.eclipse.rdf4j:rdf4j-model:5.0.1")
+    implementation("org.eclipse.rdf4j:rdf4j-rio-turtle:5.0.1")
+    implementation(libs.slf4j.api)
+    implementation(libs.slf4j.static)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

@@ -8,7 +8,13 @@ import org.eclipse.californium.elements.exception.ConnectorException;
 
 public class App {
 
+    public static String ENTRYPOINT = "coap://localhost:5683";
+
     public static void main(String[] args) throws ConnectorException, IOException {
-        new SensingAgent().run();
+        if (args.length != 1) {
+            new SensingAgent(ENTRYPOINT).run();
+        } else {
+            new SensingAgent(args[0]).run();
+        }
     }
 }

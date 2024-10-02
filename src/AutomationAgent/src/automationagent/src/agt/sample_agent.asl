@@ -26,7 +26,10 @@ entrypoint("http://localhost:8080/").
 
 // Plan for if we do not find the root uri 
 +!workspaceFound(FoundWorkspace, RootWorkspaceUri) : FoundWorkspace == false <-
-       .print("Could not find root workspace, trying again next cycle.").
+       .print("Could not find root workspace, trying again next cycle.");
+       .random([10000,20000,50000],X);
+       /wait(X);
+       !findOrganisation. 
 
 // If we find a URI for a root workspace plan
 +!workspaceFound(FoundWorkspace, RootWorkspaceUri) : FoundWorkspace == true <-

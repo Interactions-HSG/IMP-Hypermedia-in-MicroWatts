@@ -6,9 +6,10 @@ package org.example;
 import java.io.IOException;
 import org.eclipse.californium.elements.exception.ConnectorException;
 
+
 public class App {
 
-    public static String ENTRYPOINT = "coap://localhost:5683";
+    public static String ENTRYPOINT = "coap://localhost:5684";
 
     public static void main(String[] args) throws ConnectorException, IOException {
         if (args.length != 1) {

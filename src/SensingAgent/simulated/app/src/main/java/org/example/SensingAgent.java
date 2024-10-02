@@ -3,25 +3,36 @@ package org.example;
 import static org.eclipse.rdf4j.model.util.Values.iri;
 
 import ch.unisg.ics.interactions.wot.td.ThingDescription;
+import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
+import ch.unisg.ics.interactions.wot.td.affordances.Form;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
+import ch.unisg.ics.interactions.wot.td.io.TDGraphWriter;
+import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.elements.exception.ConnectorException;
 
-public class SensingAgent {
+public class SensingAgent extends CoapServer {
 
   private final String ENTRYPOINT;
+  private final String metadata;
 
   private boolean running = false;
   private CoapClient coapClient;
 
-  public SensingAgent(String entrypoint) {
+  public SensingAgent(String entrypoint) throws IOException {
     this.ENTRYPOINT = entrypoint;
+    this.metadata = getRepresentation();
   }
 
   public void run() throws ConnectorException, IOException {
-    running = true;
-    final var foundDB = findDB();
+    this.start();
+    getRepresentation();
+    //running = true;
+    // final var foundDB = findDB();
     while (running) {
       System.out.println("Sensing...");
       sendSensingData();
@@ -106,5 +117,36 @@ public class SensingAgent {
 
   private String cleanUri(final String ucleanUri) {
     return ucleanUri.replaceAll("/#[^/]*$", "");
+  }
+
+  public String getRepresentation() {
+    final var tdBuilder = new ThingDescription.Builder("SensingAgent");
+    tdBuilder.addThingURI(String.valueOf(this.getEndpoints().getFirst().getUri()));
+    tdBuilder.addSemanticType("https://purl.org/hmas/SensingAgent");
+    final var td = tdBuilder.addAction(
+        new ActionAffordance.Builder("getSensorData",
+            new Form.Builder("http://database.com/sensordata")
+                .setContentType("application/json")
+                .setMethodName("GET")
+                .build()
+        )
+            .addInputSchema(new DataSchema.Builder().build())
+            .build())
+        .build();
+
+
+    final var metadata = new TDGraphWriter(td)
+        .setNamespace("td", "https://www.w3.org/2019/wot/td#")
+        .setNamespace("htv", "http://www.w3.org/2011/http#")
+        .setNamespace("hctl", "https://www.w3.org/2019/wot/hypermedia#")
+        .setNamespace("wotsec", "https://www.w3.org/2019/wot/security#")
+        .setNamespace("dct", "http://purl.org/dc/terms/")
+        .setNamespace("js", "https://www.w3.org/2019/wot/json-schema#")
+        .setNamespace("hmas", "https://purl.org/hmas/")
+        .setNamespace("ex", "http://example.org/")
+        .setNamespace("jacamo", "http://jacamo.sourceforge.net/")
+        .write();
+    System.out.println(metadata);
+    return metadata;
   }
 }

@@ -14,7 +14,7 @@
 
 mas automationagent {
 
-    agent bob: sample_agent.asl {
+    agent bob: automation_agent.asl {
       focus: w.c1 
     }
 

@@ -14,8 +14,3 @@ RUN chmod +x /opt/src/automationagent/gradlew
 WORKDIR /opt/src/automationagent
 # The default http port
 EXPOSE 8081
-
-# Set the entrypoint to run gradlew
-ENTRYPOINT ["./gradlew"]
-CMD ["-q", "--console=plain"]
-# We can also just start it from inside the container

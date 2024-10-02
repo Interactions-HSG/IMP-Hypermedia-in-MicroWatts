@@ -8,3 +8,4 @@ junit-jupiter = "5.10.3"
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+californium = { module = "org.eclipse.californium:californium-core", version = "2.6.0" }

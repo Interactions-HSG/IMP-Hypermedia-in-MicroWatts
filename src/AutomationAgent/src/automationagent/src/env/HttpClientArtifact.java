@@ -58,13 +58,12 @@ public class HttpClientArtifact extends Artifact{
     }
 
     @OPERATION
-    public void getWorkspace(String workspaceName, String entrypointTDString, OpFeedbackParam<String> result) {
+    public void getWorkspace(String workspaceName, String entrypointTDString,OpFeedbackParam<Boolean> found, OpFeedbackParam<String> result) {
         ThingDescription td = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, entrypointTDString);
         final var expectedWorkspaceURI = ENTRYPOINT + "workspaces/" + workspaceName +"/#workspace";
         final var foundWorkspace = findWorkspace(td, workspaceName, expectedWorkspaceURI);
-        System.out.println(foundWorkspace);
-        final var workspaceUri = ENTRYPOINT + "workspaces/" + workspaceName;
-        result.set(workspaceUri);
+        found.set(foundWorkspace);
+        result.set(cleanUri(expectedWorkspaceURI));
 
     }
 
@@ -76,12 +75,29 @@ public class HttpClientArtifact extends Artifact{
     }
 
     @OPERATION
-    public void joinOrganisationInWorkspace(final String workspaceRepresenation){
+    public void findOrganisationInWorkspace(final String workspaceRepresenation, OpFeedbackParam<Boolean> found,
+                                            OpFeedbackParam<String> orgArtifactUri){
         final var model = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, workspaceRepresenation).getGraph().get();
         final var artifactsInWorkspace = model.filter(null, iri("https://purl.org/hmas/contains"),null);
         if (artifactsInWorkspace.isEmpty()) {
            System.out.println("No org artifact present");
+           found.set(false);
+           return;
         }
+        final var uncleanedArtifactUri = artifactsInWorkspace.stream().findFirst().get().getObject().toString();
+        orgArtifactUri.set(cleanUri(uncleanedArtifactUri));
+        found.set(true);
+    }
+
+
+    private String cleanUri(final String ucleanUri){
+        return ucleanUri.replaceAll("/#[^/]*$", "");
+    }
+
+
+    @OPERATION
+    public void joinOrganisation(final String orgArtifactRepresentation, OpFeedbackParam<Boolean> success){
+        System.out.println(orgArtifactRepresentation);
     }
 
 }

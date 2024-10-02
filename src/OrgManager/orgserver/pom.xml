@@ -35,7 +35,14 @@
 		    <artifactId>gson</artifactId>
 		    <version>2.10</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.jacamo/moise -->
+
+		<dependency>
+    <groupId>org.jacamo</groupId>
+    <artifactId>moise</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/libs/moise-1.1-SNAPSHOT.jar</systemPath>
+</dependency>
 
 	</dependencies>
 

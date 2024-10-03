@@ -13,6 +13,7 @@ public class App {
 
     public static String ENTRYPOINT = "coap://localhost:5683/";
     public static String METADATA;
+    public static String MY_ROOM = "room1";
 
   static {
     try {
@@ -23,10 +24,10 @@ public class App {
   }
 
   public static void main(String[] args) throws ConnectorException, IOException {
-        if (args.length != 2) {
-            new SensingAgent(ENTRYPOINT, METADATA).run();
+        if (args.length != 3) {
+            new SensingAgent(ENTRYPOINT, METADATA, MY_ROOM).run();
         } else {
-            new SensingAgent(args[0], args[1]).run();
+            new SensingAgent(args[0], args[1], args[2]).run();
         }
     }
 }

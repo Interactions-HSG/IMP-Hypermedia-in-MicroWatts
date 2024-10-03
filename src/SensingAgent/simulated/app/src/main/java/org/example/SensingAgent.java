@@ -17,14 +17,18 @@ public class SensingAgent extends CoapServer {
 
   private final String ENTRYPOINT;
   private final String metadata;
+  private String location;
+  private String locationUri;
   private String baseUriYggdrasil;
 
   private boolean running = false;
 
-  public SensingAgent(String entrypoint, String metadata) {
+  public SensingAgent(String entrypoint, String metadata, String room) {
     super(5684);
     this.ENTRYPOINT = entrypoint;
     this.metadata = metadata;
+    this.location = room;
+    this.locationUri = null;
   }
 
   public void run() throws ConnectorException, IOException {
@@ -32,9 +36,6 @@ public class SensingAgent extends CoapServer {
     this.setup();
 
 
-    //running = true;
-    // final var foundDB = findDB();
-    final var joinedRootWorkspace = joinRootWorkspace();
     while (running) {
       System.out.println("Sensing...");
       sendSensingData();
@@ -51,15 +52,25 @@ public class SensingAgent extends CoapServer {
   /**
    * Helper method that sets up the base URI of the Yggdrasil platform.
    * Needed because base URI is an HTTP URI and the TD representations returned
-   * by the platform all build on this uri.
+   * by the platform all build on this uri. Tries to join the workspace currently
+   * recognized to be where the agent should be. Also tries to find the DB artifact
+   * and link its representation.
    */
   private void setup() throws ConnectorException, IOException {
-    final var coapClient = new CoapClient(ENTRYPOINT);
-    final String platformRepresentation = coapClient.get().getResponseText();
+    final String platformRepresentation = sendCoapMessage(ENTRYPOINT);
     final var td = TDGraphReader.
         readFromString(ThingDescription.TDFormat.RDF_TURTLE, platformRepresentation);
     baseUriYggdrasil = cleanUri(td.getThingURI().orElseThrow());
-    coapClient.shutdown();
+    final var joined = joinMyWorkspace();
+    if (!joined) {
+      System.out.println("Failed to join workspace");
+      return;
+    }
+    final var dbFound = findDB();
+    if (!dbFound) {
+      System.out.println("Failed to find DB");
+    }
+
   }
 
   public void stopRunning() {
@@ -102,17 +113,17 @@ public class SensingAgent extends CoapServer {
 
   }
 
-  private boolean joinRootWorkspace() throws ConnectorException, IOException {
+  private boolean joinMyWorkspace() throws ConnectorException, IOException {
     final String platformRepresentation = sendCoapMessage(ENTRYPOINT);
-    final String rootWorkspaceUri = getWorkspaceUri("root", platformRepresentation);
+    final String myWorkspaceUri = getWorkspaceUri(location, platformRepresentation);
 
-    if (rootWorkspaceUri == null) {
-      System.out.println("Root workspace not found");
+    if (myWorkspaceUri == null) {
+      System.out.println("My workspace not found");
       return false;
     }
 
-    final String rootWorkspaceRepresentation = sendCoapMessage(rootWorkspaceUri);
-    final String joinFormUri = getJoinFormUri(rootWorkspaceRepresentation);
+    final String myWorkspaceRepresentation = sendCoapMessage(myWorkspaceUri);
+    final String joinFormUri = getJoinFormUri(location, myWorkspaceRepresentation);
     if (joinFormUri == null) {
       System.out.println("Join form not found");
       return false;
@@ -128,20 +139,25 @@ public class SensingAgent extends CoapServer {
     request.setOptions(optionSet);
     request.setPayload(this.metadata);
     final var response = coapClient.advanced(request); // or async version
+    if (response == null) {
+      System.out.println("Join response: null - failed to join");
+      return false;
+    }
     System.out.println("Join response: " + response.getResponseText());
+    this.locationUri = myWorkspaceUri;
     coapClient.shutdown();
     return true;
   }
 
-  private String getJoinFormUri(String rootWorkspaceRepresentation) {
+  private String getJoinFormUri(String workspaceName, String WorkspaceRepresentation) {
     ThingDescription td = TDGraphReader
-        .readFromString(ThingDescription.TDFormat.RDF_TURTLE, rootWorkspaceRepresentation);
+        .readFromString(ThingDescription.TDFormat.RDF_TURTLE, WorkspaceRepresentation);
     final var joinWorkspaceAffordance = td.getActionByName("joinWorkspace");
     if (joinWorkspaceAffordance.isPresent()) {
       final var joinWorkspaceAction = joinWorkspaceAffordance.get();
       final var joinWorkspaceForm = joinWorkspaceAction.getFirstForm();
       System.out.println("Join form found: " + joinWorkspaceForm.get().getTarget());
-      return ENTRYPOINT + "workspaces/root/join";
+      return ENTRYPOINT + "workspaces/" + workspaceName + "/join";
     }
     return null;
   }
@@ -151,6 +167,7 @@ public class SensingAgent extends CoapServer {
         TDGraphReader.readFromString(ThingDescription.TDFormat.RDF_TURTLE, entrypointTDString);
     final var expectedWorkspaceURI = baseUriYggdrasil + "/workspaces/" + workspaceName +
         "/#workspace";
+    System.out.println("Expected workspace URI: " + expectedWorkspaceURI);
     final var foundWorkspace = findWorkspaceUri(td, expectedWorkspaceURI);
     if (foundWorkspace) {
       return ENTRYPOINT + "workspaces/" + workspaceName;
@@ -163,7 +180,7 @@ public class SensingAgent extends CoapServer {
     ThingDescription td =
         TDGraphReader.readFromString(ThingDescription.TDFormat.RDF_TURTLE, workspaceRepresenation);
     final var workspaceUri = cleanUri(td.getThingURI().get());
-    final var expectedArtifactURI = workspaceUri + "artifacts/" + artifactName + "/#artifact";
+    final var expectedArtifactURI = workspaceUri + "/artifacts/" + artifactName + "/#artifact";
     final var foundArtifact = findArtifactUri(td, expectedArtifactURI);
     if (foundArtifact) {
       return cleanUri(expectedArtifactURI);

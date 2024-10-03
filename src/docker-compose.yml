@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   organization_manager:
     build:
@@ -12,14 +10,18 @@ services:
     networks:
       - imp_network
 
-  db:
-    build:
-      context: ./DB
-    container_name: db
+  db-database:
+    container_name: db-database
+    image: postgres:alpine
     ports:
-      - "5684:5683/udp"
+      - 5701:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=test123!
+      - POSTGRES_DB=accounting
     networks:
       - imp_network
+
 
   yggdrasil:
     image: yggdrasil:latest

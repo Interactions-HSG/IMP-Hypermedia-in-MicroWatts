@@ -3,19 +3,30 @@
  */
 package org.example;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import org.eclipse.californium.elements.exception.ConnectorException;
 
 
 public class App {
 
-    public static String ENTRYPOINT = "coap://localhost:5684";
+    public static String ENTRYPOINT = "coap://localhost:5683/";
+    public static String METADATA;
 
-    public static void main(String[] args) throws ConnectorException, IOException {
-        if (args.length != 1) {
-            new SensingAgent(ENTRYPOINT).run();
+  static {
+    try {
+      METADATA = Files.readString(new File("/Users/kaischultz/github/IMP-Hypermedia-in-MicroWatts/src/SensingAgent/simulated/app/src/main/resources/metadata.ttl").toPath());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static void main(String[] args) throws ConnectorException, IOException {
+        if (args.length != 2) {
+            new SensingAgent(ENTRYPOINT, METADATA).run();
         } else {
-            new SensingAgent(args[0]).run();
+            new SensingAgent(args[0], args[1]).run();
         }
     }
 }

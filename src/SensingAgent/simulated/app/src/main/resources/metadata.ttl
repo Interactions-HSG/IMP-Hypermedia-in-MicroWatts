@@ -1,13 +1,10 @@
 @prefix td: <https://www.w3.org/2019/wot/td#> .
-@prefix wotsec: <https://www.w3.org/2019/wot/security#> .
 @prefix htv: <https://www.w3.org/2011/http#> .
 @prefix hctl: <https://www.w3.org/2019/wot/hypermedia#> .
 @prefix js: <https://www.w3.org/2019/wot/json-schema#> .
 
 
-<> a td:Thing;
-    td:title "Sensing Agent";
-    td:hasSecurityConfiguration [ a wotsec:NoSecurityScheme ];
+<#artifact> a td:Thing;
     td:hasActionAffordance [
         a td:ActionAffordance;
         td:name "getSensorData";

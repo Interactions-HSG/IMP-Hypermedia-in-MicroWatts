@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class Launcher {
 
-    public static String ENTRYPOINT = "http://localhost:8080/";
+    public static String ENTRYPOINT = "http://yggdrasil:8080/";
     public static String name = "db";
     public static String telemetry = "telemetry";
 
@@ -64,7 +64,7 @@ public class Launcher {
         if (action.isPresent()) {
 
             // create a new form because the default form only allows Content-Type: application/json
-            Form form = new Form.Builder("http://localhost:8080/workspaces/db/artifacts/")
+            Form form = new Form.Builder("http://yggdrasil:8080/workspaces/db/artifacts/")
                     .setMethodName("POST")
                     .setContentType("text/turtle")
                     .addOperationType(TD.invokeAction)
@@ -76,7 +76,7 @@ public class Launcher {
             requestArtifact.addHeader("X-Agent-WebID", "");
 
             // create a form to make a get request for the temperature
-            Form getTemperatureForm = new Form.Builder("http://localhost:7600/get/temperature")
+            Form getTemperatureForm = new Form.Builder("http://db:7600/get/temperature")
                 .setMethodName("GET")
                 .build();
 
@@ -87,7 +87,7 @@ public class Launcher {
 
             // create a new thing description for the artifact
             ThingDescription tdTemperature = (new ThingDescription.Builder("Interaction with db"))
-                .addThingURI("http://localhost:7600")
+                .addThingURI("http://db:7600")
                 .addAction(getTemperature)
                 .build();
             String description = new TDGraphWriter(tdTemperature)

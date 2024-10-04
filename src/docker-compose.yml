@@ -10,15 +10,12 @@ services:
     networks:
       - smart-buidling
 
-  db-database:
-    container_name: db-database
-    image: postgres:alpine
+  db:
+    container_name: db
+    build:
+      context: ./DB
     ports:
-      - 5701:5432
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=test123!
-      - POSTGRES_DB=accounting
+      - 7600:7600
     networks:
       - smart-buidling
 

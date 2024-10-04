@@ -31,7 +31,6 @@ public class Launcher {
 
         // read the thing description of yggdrasil
         ThingDescription tdYggdrasil = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT);
-        System.out.println("GESCHAFFT?");
 
         // retrieve action to create a new workspace for the db
         Optional<ActionAffordance> createWorkspace = tdYggdrasil.getActionByName("createWorkspace");

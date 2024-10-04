@@ -15,11 +15,11 @@ import java.util.Optional;
 
 public class Launcher {
 
-    public static String ENTRYPOINT = "http://localhost:8899/";
+    public static String ENTRYPOINT = "http://localhost:8080/";
     public static String name = "db";
     public static String telemetry = "telemetry";
 
-    public static void main(String[] args) throws IOException {
+    public static void main() throws IOException {
 
         System.out.println("Starting server...");
 
@@ -31,6 +31,7 @@ public class Launcher {
 
         // read the thing description of yggdrasil
         ThingDescription tdYggdrasil = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT);
+        System.out.println("GESCHAFFT?");
 
         // retrieve action to create a new workspace for the db
         Optional<ActionAffordance> createWorkspace = tdYggdrasil.getActionByName("createWorkspace");
@@ -63,7 +64,7 @@ public class Launcher {
         if (action.isPresent()) {
 
             // create a new form because the default form only allows Content-Type: application/json
-            Form form = new Form.Builder("http://localhost:8899/workspaces/db/artifacts/")
+            Form form = new Form.Builder("http://localhost:8080/workspaces/db/artifacts/")
                     .setMethodName("POST")
                     .setContentType("text/turtle")
                     .addOperationType(TD.invokeAction)

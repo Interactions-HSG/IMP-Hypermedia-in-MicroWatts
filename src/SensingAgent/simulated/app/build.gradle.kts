@@ -8,6 +8,10 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    // Apply the Java plugin to add support for building Java applications.
+    java
+    // shadowJar
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 repositories {

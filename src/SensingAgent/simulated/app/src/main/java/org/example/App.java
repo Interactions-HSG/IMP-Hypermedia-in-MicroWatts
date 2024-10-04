@@ -11,13 +11,13 @@ import org.eclipse.californium.elements.exception.ConnectorException;
 
 public class App {
 
-    public static String ENTRYPOINT = "coap://localhost:5683/";
+    public static String ENTRYPOINT = System.getenv("ENTRYPOINT");
     public static String METADATA;
     public static String MY_ROOM = "room1";
 
   static {
     try {
-      METADATA = Files.readString(new File("/Users/kaischultz/github/IMP-Hypermedia-in-MicroWatts/src/SensingAgent/simulated/app/src/main/resources/metadata.ttl").toPath());
+      METADATA = Files.readString(new File("/app/app/src/main/resources/metadata.ttl").toPath());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -1,7 +1,7 @@
 // Agent sample_agent in project automationagent
 
 /* Initial beliefs and rules */
-entrypoint("http://localhost:8080/").
+entrypoint("http://yggdrasil:8080/").
 
 /* Initial goals */
 
@@ -13,23 +13,34 @@ entrypoint("http://localhost:8080/").
     <- .print("hello world.");
        .date(Y,M,D); .time(H,Min,Sec,MilSec); // get current date & time
        +started(Y,M,D,H,Min,Sec);             // add a new belief
-       !findOrganisation.                     // First thing Automation Agent will do is join Organisation
+       !findHyperMediaEnvironment.                     // First thing Automation Agent will do is join Organisation
 
 
 // Currently hardcoded EntryURI will be used
-+!findOrganisation : entrypoint(URI) <- 
++!findHyperMediaEnvironment : entrypoint(URI) <- 
        .print("Finding organisation");
-       readEndpoint(URI, EntrypointRepresentation);                                        // returns TD of platform
-       .print("Found Entrypoint, checking out root workspace");                            
+       getEntrypoint(URI, EntrypointRepresentation, Success);
+       !entrypointFound(EntrypointRepresentation, Success).
+
+
++!entrypointFound(EntrypointRepresentation, Success) : Success == true <-
+       .print("Found entrypoint, checking out root workspace");
        getWorkspace("root",EntrypointRepresentation, FoundWorkspace ,RootWorkspaceUri);    // Returns true / false and the URI to the rootWorkspace
        !workspaceFound(FoundWorkspace, RootWorkspaceUri).
+       
++!entrypointFound(EntrypointRepresentation, Success) : Success == false <-
+       .print("Could not find entrypoint, trying again next cycle.");
+       .random([10000,20000,50000],X);
+       .wait(X);
+       !findOrganisation.
+
 
 // Plan for if we do not find the root uri 
 +!workspaceFound(FoundWorkspace, RootWorkspaceUri) : FoundWorkspace == false <-
        .print("Could not find root workspace, trying again next cycle.");
        .random([10000,20000,50000],X);
        .wait(X);
-       !findOrganisation. 
+       !findHyperMediaEnvironment. 
 
 // If we find a URI for a root workspace plan
 +!workspaceFound(FoundWorkspace, RootWorkspaceUri) : FoundWorkspace == true <-

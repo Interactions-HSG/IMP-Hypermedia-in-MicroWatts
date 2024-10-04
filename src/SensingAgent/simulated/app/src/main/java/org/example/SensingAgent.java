@@ -65,7 +65,7 @@ public class SensingAgent extends CoapServer {
     while (!joined) {
       System.out.println("Failed to join workspace");
       try {
-        Thread.sleep(1000);
+        Thread.sleep(10000);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -77,7 +77,7 @@ public class SensingAgent extends CoapServer {
     while (!dbFound) {
       System.out.println("Failed to find DB");
       try {
-        Thread.sleep(1000);
+        Thread.sleep(10000);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

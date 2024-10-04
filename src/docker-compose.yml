@@ -53,9 +53,10 @@ services:
       context: ./SensingAgent
     container_name: sensing_agent
     environment:
-      - ENTRYPOINT=coap://0.0.0.0:5683
+      - ENTRYPOINT=coap://yggdrasil:5683/
     ports:
       - "8082:8082"
+      - "5684:5684/udp"
     networks:
         - smart-buidling
     restart: on-failure

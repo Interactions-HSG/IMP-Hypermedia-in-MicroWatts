@@ -7,7 +7,7 @@
   "coap-config" : {
     "host": "0.0.0.0",
     "port": 5683,
-    "base-uri": "coap://0.0.0.0:5683/"
+    "base-uri": "coap://yggdrasil:5683/"
   },
   "rdf-store" : {
     "in-memory" : false,

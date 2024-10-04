@@ -5,7 +5,12 @@
    September 28, 2024 - 10:08:32
 */
 
+
+plugins {
+}
+
 defaultTasks 'run'
+
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -13,6 +18,9 @@ apply from: '.jcm-deps.gradle' // this file contains dependencies declared in th
 
 version '1.0'
 group   'org.jacamo'
+
+
+
 
 java {
     toolchain {

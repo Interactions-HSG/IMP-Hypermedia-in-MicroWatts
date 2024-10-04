@@ -18,10 +18,9 @@ public class Launcher {
     public static String ENTRYPOINT = "http://yggdrasil:8080/";
     public static String name = "db";
     public static String telemetry = "telemetry";
+    public static String telemetryCoaP = "telemetryCoaP";
 
     public static void main() throws IOException {
-
-        System.out.println("Starting server...");
 
         /**
          * read the thing description of yggdrasil
@@ -42,7 +41,7 @@ public class Launcher {
             request.addHeader("Slug", name);
             request.addHeader("X-Agent-WebID", "");
             TDHttpResponse response = request.execute();
-            System.out.println("Status code: " + response.getStatusCode());
+            System.out.println("Status code: " + response.getStatusCode() + ". Thing Description was created.");
         } else {
             System.out.println("No action found");
         }
@@ -58,6 +57,9 @@ public class Launcher {
 
         // retrieve the action to create a new artifact in order to interact with the service itself
         Optional<ActionAffordance> action = tdWorkspace.getActionByName("makeArtifact");
+
+        /** Get temperatures */
+
 
         // if the action is valid, create a new artifact
         if (action.isPresent()) {
@@ -75,7 +77,7 @@ public class Launcher {
             requestArtifact.addHeader("X-Agent-WebID", "");
 
             // create a form to make a get request for the temperature
-            Form getTemperatureForm = new Form.Builder("http://db:7600/get/temperature")
+            Form getTemperatureForm = new Form.Builder("http://db:7600/temperatures/")
                 .setMethodName("GET")
                 .build();
 
@@ -86,7 +88,7 @@ public class Launcher {
 
             // create a new thing description for the artifact
             ThingDescription tdTemperature = (new ThingDescription.Builder("Interaction with db"))
-                .addThingURI("http://db:7600")
+                .addThingURI("http://db:7600/")
                 .addAction(getTemperature)
                 .build();
             String description = new TDGraphWriter(tdTemperature)
@@ -99,6 +101,53 @@ public class Launcher {
             TDHttpResponse responseArtifact = requestArtifact.execute();
 
             System.out.println("Status code: " + responseArtifact.getStatusCode());
+        } else {
+            System.out.println("No action found");
+        }
+
+        /** Post telemetry */
+        // if the action is valid, create a new artifact
+        if (action.isPresent()) {
+
+            // create a new form because the default form only allows Content-Type: application/json
+            Form form = new Form.Builder("http://yggdrasil:8080/workspaces/db/artifacts/")
+                    .setMethodName("POST")
+                    .setContentType("text/turtle")
+                    .addOperationType(TD.invokeAction)
+                    .build();
+
+            // create a request
+            TDHttpRequest requestArtifact = new TDHttpRequest(form, TD.invokeAction);
+            requestArtifact.addHeader("Slug", telemetryCoaP);
+            requestArtifact.addHeader("X-Agent-WebID", "");
+
+            // create a form to make a get request for the temperature
+            Form getTelemetryForm = new Form.Builder("coap://db:7601/telemetry")
+                    .setMethodName("GET")
+                    .build();
+
+            // create the action affordance
+            ActionAffordance getTelemetry = new ActionAffordance.Builder("getTelemetry", getTelemetryForm)
+                    .addTitle("Get telemetry")
+                    .build();
+
+            // create a new thing description for the artifact
+            ThingDescription tdTelemetry = (new ThingDescription.Builder("Interaction with db"))
+                    .addThingURI("coap://db:7601/")
+                    .addAction(getTelemetry)
+                    .build();
+            String description = new TDGraphWriter(tdTelemetry)
+                    .write();
+
+            System.out.println(description);
+
+            // add td to the body
+            StringSchema schema = new StringSchema.Builder().build();
+            requestArtifact.setPrimitivePayload(schema, description);
+
+            TDHttpResponse responseArtifact = requestArtifact.execute();
+
+            System.out.println("Status code: " + responseArtifact.getStatusCode() + ". Thing Description was created.");
         } else {
             System.out.println("No action found");
         }

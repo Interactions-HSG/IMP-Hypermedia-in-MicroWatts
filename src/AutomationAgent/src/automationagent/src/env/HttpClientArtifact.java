@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import org.apache.xpath.operations.Bool;
 
 import cartago.Artifact;
 import cartago.OPERATION;
@@ -20,9 +21,41 @@ import static org.eclipse.rdf4j.model.util.Values.iri;
 
 public class HttpClientArtifact extends Artifact{
 
-    private static String ENTRYPOINT = "http://localhost:8080/";
+    private static String ENTRYPOINT = "http://yggdrasil:8080/";
 
     void init(){}
+
+    public String readEndpoint(String urir) {
+        try {
+            URI uri = new URI(urir);
+
+            HttpRequest request = HttpRequest.newBuilder()
+            .uri(uri)
+            .GET()
+            .build();
+
+
+
+            HttpClient client = HttpClient.newHttpClient();
+            try {
+                System.out.println(request.toString());
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() != 200) {
+                    System.out.println("Error: " + response.statusCode());
+                }
+                String responseBody = response.body();
+                return responseBody;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @OPERATION
     public void readEndpoint(String resourceUri, OpFeedbackParam<String> result) {
@@ -56,6 +89,19 @@ public class HttpClientArtifact extends Artifact{
         }
 
     }
+
+    @OPERATION
+    public void getEntrypoint(final String uri, OpFeedbackParam<String> representation, OpFeedbackParam<Boolean> success) {
+        final String result = readEndpoint(uri);
+        if (result == null) {
+            success.set(false);
+        } else {
+            success.set(true);
+            representation.set(result);
+        }
+
+    }
+
 
     @OPERATION
     public void getWorkspace(String workspaceName, String entrypointTDString,OpFeedbackParam<Boolean> found, OpFeedbackParam<String> result) {

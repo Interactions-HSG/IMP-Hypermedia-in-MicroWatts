@@ -1,0 +1,44 @@
+{
+  "http-config" : {
+    "host" : "0.0.0.0",
+    "port" : 8080,
+    "base-uri" : "http://yggdrasil:8080/"
+  },
+  "coap-config" : {
+    "host": "0.0.0.0",
+    "port": 5683,
+    "base-uri": "coap://yggdrasil:5683/"
+  },
+  "rdf-store" : {
+    "in-memory" : false,
+    "store-path" : "data/"
+  },
+  "notification-config" : {
+    "websub-hub-base-uri" : "https://yggdrasil.interactions.ics.unisg.ch/",
+    "enabled" : true
+  },
+  "environment-config" : {
+    "known-artifacts" : [
+      {
+        "class" : "http://example.org/Counter",
+        "template" : "org.hyperagents.yggdrasil.cartago.artifacts.CounterTD"
+      }
+    ],
+    "enabled" : true,
+    "ontology" : "td",
+    "workspaces" : [
+      {
+        "name" : "root",
+        "artifacts" : [
+          {
+            "name" : "OrgManager",
+            "class" : "http://example.org/Counter"
+          }
+        ]
+      },
+      {
+        "name" : "room1"
+      }
+    ]
+  }
+}

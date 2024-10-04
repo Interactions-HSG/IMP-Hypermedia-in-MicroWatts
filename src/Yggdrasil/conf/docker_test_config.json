@@ -4,6 +4,11 @@
     "port" : 8080,
     "base-uri" : "http://localhost:8080/"
   },
+  "coap-config" : {
+    "host": "0.0.0.0",
+    "port": 5683,
+    "base-uri": "coap://localhost:5683/"
+  },
   "rdf-store" : {
     "in-memory" : false,
     "store-path" : "data/"

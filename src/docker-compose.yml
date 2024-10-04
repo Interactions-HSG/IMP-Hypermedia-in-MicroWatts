@@ -16,35 +16,49 @@ services:
       context: ./DB
     ports:
       - 7600:7600
+      - 7601:5683/udp
     networks:
       - smart-buidling
 
 
   yggdrasil:
-    image: yggdrasil:latest
     build:
       context: ./Yggdrasil
+      dockerfile: Dockerfile
     container_name: yggdrasil
     environment:
       - YGGDRASIL_VERSION=0.0.0
     ports:
       - "8080:8080"
+      - "5683:5683/udp"
     networks:
       - smart-buidling
     restart: always
 
-  AutomationAgent:
-    image: automationagent:latest
+  automation_agent:
     build:
       context: ./AutomationAgent
-    container_name: automationAgent
+    container_name: automation_agent
     environment:
       - AUTOMATION_AGENT_VERSION=0.0.0
       - YGGDRASIL_URL=http://yggdrasil:8080
     ports:
-      - "8898:8081"
+      - "8081:8081"
     networks:
       - smart-buidling
+    restart: on-failure
+
+  sensing_agent:
+    build:
+      context: ./SensingAgent
+    container_name: sensing_agent
+    environment:
+      - ENTRYPOINT=coap://yggdrasil:5683/
+    ports:
+      - "8082:8082"
+      - "5684:5684/udp"
+    networks:
+        - smart-buidling
     restart: on-failure
 
 networks:

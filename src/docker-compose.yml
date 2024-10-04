@@ -11,13 +11,15 @@ services:
       - smart-buidling
 
   db:
+    container_name: db
     build:
       context: ./DB
-    container_name: db
     ports:
-      - "5684:5683/udp"
+      - 7600:7600
+      - 7601:5683/udp
     networks:
       - smart-buidling
+
 
   yggdrasil:
     image: yggdrasil:latest

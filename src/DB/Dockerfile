@@ -1,16 +1,13 @@
-FROM golang:1.23-alpine
+FROM maven as build
 
-# set destination for COPY
-WORKDIR /app
+COPY . /app
 
-# copy everything to the working directory
-COPY . .
+RUN mvn -f app/pom.xml clean package -DskipTests
 
-# download go modules
-RUN go mod download
+FROM openjdk:21-jdk
 
-# build
-RUN GOOS=linux go build -o main cmd/main.go
+COPY --from=build /app/target/DB-0.0.1.jar ./DB-0.0.1.jar
 
-# start
-CMD ["./main"]
+COPY --from=build /app/src/main/resources/application.properties ./application.properties
+
+CMD ["java", "-jar", "DB-0.0.1.jar", "--spring.config.location=application.properties"]

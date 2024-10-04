@@ -16,4 +16,12 @@ public class TelemetryController extends CoapResource {
         exchange.respond("Hello World!");
     }
 
+    @Override
+    public void handlePOST(CoapExchange exchange) {
+        exchange.accept();
+        final var payload = exchange.getRequestText();
+        System.out.println("Received payload: " + payload);
+        exchange.respond("Received payload.");
+    }
+
 }

@@ -20,6 +20,7 @@ public class SensingAgent extends CoapServer {
   private String location;
   private String locationUri;
   private String baseUriYggdrasil;
+  private String dbPostSensorDataUri;
 
   private boolean running = false;
 
@@ -107,30 +108,38 @@ public class SensingAgent extends CoapServer {
     final String platformRepresentation = sendCoapMessage(ENTRYPOINT);
     final String rootWorkspaceUri = getWorkspaceUri("root", platformRepresentation);
     if (rootWorkspaceUri == null) {
-      System.out.println("DB not found");
+      System.out.println("root workspace not found");
       return false;
     }
 
     final String rootWorkspaceRepresentation = sendCoapMessage(rootWorkspaceUri);
-    final String DBArtifactUri = getArtifactUri("DB", rootWorkspaceRepresentation);
+    final String DBArtifactUri = getArtifactUri("datalake", rootWorkspaceRepresentation);
     if (DBArtifactUri == null) {
-      System.out.println("DB not found");
+      System.out.println("datalake not found");
       return false;
     }
     final String DBRepresentation = sendCoapMessage(DBArtifactUri);
     final var dbTD = TDGraphReader
         .readFromString(ThingDescription.TDFormat.RDF_TURTLE, DBRepresentation);
 
-    final var dbEndpoint = dbTD.getActionByName("query");
+    final var dbEndpoint = dbTD.getActionByName("postSensorData");
 
-    System.out.println("DB found: " + DBRepresentation);
+    if (dbEndpoint.isEmpty()) {
+      System.out.println("DB endpoint not found");
+      return false;
+    }
+
+    dbPostSensorDataUri = dbEndpoint.get().getFirstForm().get().getTarget();
+    System.out.println("DB endpoint: " + dbEndpoint.get().getFirstForm().get().getTarget());
     return true;
   }
 
   private void sendSensingData() throws ConnectorException, IOException {
     System.out.println("Sending sensing data...");
-    final var coapClient = new CoapClient(ENTRYPOINT);
-    coapClient.post("sensing data", 0);
+    final var coapClient = new CoapClient(dbPostSensorDataUri);
+    Request request = new Request(CoAP.Code.POST, CoAP.Type.NON);
+    request.setPayload("\"temperature\":\"20\",\"humidity\":\"50\"");
+    coapClient.advanced(request); // or async version
     coapClient.shutdown();
 
   }

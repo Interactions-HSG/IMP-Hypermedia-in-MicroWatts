@@ -8,7 +8,7 @@ public class TelemetryController extends CoapResource {
     public TelemetryController(String uri) {
         super(uri);
         setObservable(true);
-        getAttributes().setTitle("Telemetry");
+        getAttributes().setTitle("data");
     }
 
     @Override

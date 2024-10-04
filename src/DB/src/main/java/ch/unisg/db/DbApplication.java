@@ -38,7 +38,7 @@ public class DbApplication {
         int port = Configuration.getStandard().get(CoapConfig.COAP_PORT);
         DBServer server = new DBServer(udp, tcp, port);
 
-        server.add(new TelemetryController("telemetry"));
+        server.add(new TelemetryController("data"));
 
         server.start();
         System.out.println("Server started");

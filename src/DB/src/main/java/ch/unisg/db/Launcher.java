@@ -20,8 +20,6 @@ public class Launcher {
     public static String ENTRYPOINT = "http://yggdrasil:8080/";
     public static String WORKSPACE = "root";
     public static String name = "datalake";
-    public static String telemetry = "telemetry";
-    public static String telemetryCoaP = "telemetryCoaP";
 
     public static void main() throws IOException {
 
@@ -46,7 +44,7 @@ public class Launcher {
                 "workspaces/" + WORKSPACE);
 
         // retrieve the action to create a new artifact in order to interact with the service itself
-        Optional<ActionAffordance> action = tdWorkspace.getActionByName("makeArtifact");
+        Optional<ActionAffordance> action = tdWorkspace.getActionByName("createArtifact");
 
         /** Get temperatures */
 
@@ -68,7 +66,7 @@ public class Launcher {
             requestArtifact.addHeader("Slug", name);
             requestArtifact.addHeader("X-Agent-WebID", "http://db:7600/");
 
-            final var metadata = Files.readString(Path.of("src/main/resources/metadata.ttl"));
+            final var metadata = Files.readString(Path.of("metadata.ttl"));
             // add td to the body
             StringSchema schema = new StringSchema.Builder().build();
             requestArtifact.setPrimitivePayload(schema, metadata);

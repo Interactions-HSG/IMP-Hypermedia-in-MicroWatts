@@ -47,7 +47,7 @@
 			<artifactId>moise</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/moise-1.1-SNAPSHOT.jar</systemPath>
+			<systemPath>${project.basedir}/libs/moise-1.0.jar</systemPath>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-model -->

@@ -22,19 +22,25 @@ public class DbApplication {
 
     public static void main(String[] args) throws IOException {
 
+        System.out.println("Starting server...");
+
+        SpringApplication.run(DbApplication.class, args);
+
+        /** set up yggdrasil */
+        System.out.println("Setting up yggdrasil...");
+        Launcher.main();
+
+        /** Set up coap */
+        System.out.println("Setting up Coap...");
         boolean udp = true;
         boolean tcp = false;
 
         int port = Configuration.getStandard().get(CoapConfig.COAP_PORT);
-        System.out.println("Using port " + port);
-
-        SpringApplication.run(DbApplication.class, args);
-        Launcher.main();
-
         DBServer server = new DBServer(udp, tcp, port);
 
         server.add(new TelemetryController("telemetry"));
 
         server.start();
+        System.out.println("Server started");
     }
 }

@@ -15,8 +15,8 @@ services:
     build:
       context: ./DB
     ports:
-      - 7600:7600
-      - 7601:5683/udp
+      - "7600:7600"
+      - "5685:5685/udp"
     networks:
       - smart-buidling
 

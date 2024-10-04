@@ -5,6 +5,7 @@
     "base-uri" : "http://yggdrasil:8080/"
   },
   "coap-config" : {
+    "enabled" : true,
     "host": "0.0.0.0",
     "port": 5683,
     "base-uri": "coap://yggdrasil:5683/"

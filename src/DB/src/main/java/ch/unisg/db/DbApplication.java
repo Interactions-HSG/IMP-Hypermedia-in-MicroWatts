@@ -35,10 +35,10 @@ public class DbApplication {
         boolean udp = true;
         boolean tcp = false;
 
-        int port = Configuration.getStandard().get(CoapConfig.COAP_PORT);
+        int port = 5685;
         DBServer server = new DBServer(udp, tcp, port);
 
-        server.add(new TelemetryController("telemetry"));
+        server.add(new TelemetryController("data"));
 
         server.start();
         System.out.println("Server started");

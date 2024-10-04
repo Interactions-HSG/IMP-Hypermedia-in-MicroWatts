@@ -11,12 +11,15 @@ import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public class Launcher {
 
     public static String ENTRYPOINT = "http://yggdrasil:8080/";
-    public static String name = "db";
+    public static String WORKSPACE = "root";
+    public static String name = "datalake";
     public static String telemetry = "telemetry";
     public static String telemetryCoaP = "telemetryCoaP";
 
@@ -31,21 +34,6 @@ public class Launcher {
         // read the thing description of yggdrasil
         ThingDescription tdYggdrasil = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT);
 
-        // retrieve action to create a new workspace for the db
-        Optional<ActionAffordance> createWorkspace = tdYggdrasil.getActionByName("createWorkspace");
-
-        // if the action is valid, create a new workspace
-        if (createWorkspace.isPresent()) {
-            Optional<Form> form = createWorkspace.get().getFirstForm();
-            TDHttpRequest request = new TDHttpRequest(form.get(), TD.invokeAction);
-            request.addHeader("Slug", name);
-            request.addHeader("X-Agent-WebID", "");
-            TDHttpResponse response = request.execute();
-            System.out.println("Status code: " + response.getStatusCode() + ". Thing Description was created.");
-        } else {
-            System.out.println("No action found");
-        }
-
         /**
          * read the thing description of the workspace
          * retrieve the action to create an artifact
@@ -53,7 +41,9 @@ public class Launcher {
          */
 
         // read the thing description of the workspace
-        ThingDescription tdWorkspace = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT + "workspaces/" + name);
+        ThingDescription tdWorkspace =
+            TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT +
+                "workspaces/" + WORKSPACE);
 
         // retrieve the action to create a new artifact in order to interact with the service itself
         Optional<ActionAffordance> action = tdWorkspace.getActionByName("makeArtifact");
@@ -72,82 +62,20 @@ public class Launcher {
                     .build();
 
             // create a request
-            TDHttpRequest requestArtifact = new TDHttpRequest(form, TD.invokeAction);
-            requestArtifact.addHeader("Slug", telemetry);
-            requestArtifact.addHeader("X-Agent-WebID", "");
+            TDHttpRequest requestArtifact = new TDHttpRequest(action.get().getFirstForm()
+                .orElseThrow(),
+                TD.invokeAction);
+            requestArtifact.addHeader("Slug", name);
+            requestArtifact.addHeader("X-Agent-WebID", "http://db:7600/");
 
-            // create a form to make a get request for the temperature
-            Form getTemperatureForm = new Form.Builder("http://db:7600/temperatures/")
-                .setMethodName("GET")
-                .build();
-
-            // create the action affordance
-            ActionAffordance getTemperature = new ActionAffordance.Builder("getTemperature", getTemperatureForm)
-                    .addTitle("Get temperature")
-                    .build();
-
-            // create a new thing description for the artifact
-            ThingDescription tdTemperature = (new ThingDescription.Builder("Interaction with db"))
-                .addThingURI("http://db:7600/")
-                .addAction(getTemperature)
-                .build();
-            String description = new TDGraphWriter(tdTemperature)
-                .write();
-
+            final var metadata = Files.readString(Path.of("src/main/resources/metadata.ttl"));
             // add td to the body
             StringSchema schema = new StringSchema.Builder().build();
-            requestArtifact.setPrimitivePayload(schema, description);
+            requestArtifact.setPrimitivePayload(schema, metadata);
 
             TDHttpResponse responseArtifact = requestArtifact.execute();
 
             System.out.println("Status code: " + responseArtifact.getStatusCode());
-        } else {
-            System.out.println("No action found");
-        }
-
-        /** Post telemetry */
-        // if the action is valid, create a new artifact
-        if (action.isPresent()) {
-
-            // create a new form because the default form only allows Content-Type: application/json
-            Form form = new Form.Builder("http://yggdrasil:8080/workspaces/db/artifacts/")
-                    .setMethodName("POST")
-                    .setContentType("text/turtle")
-                    .addOperationType(TD.invokeAction)
-                    .build();
-
-            // create a request
-            TDHttpRequest requestArtifact = new TDHttpRequest(form, TD.invokeAction);
-            requestArtifact.addHeader("Slug", telemetryCoaP);
-            requestArtifact.addHeader("X-Agent-WebID", "");
-
-            // create a form to make a get request for the temperature
-            Form getTelemetryForm = new Form.Builder("coap://db:7601/telemetry")
-                    .setMethodName("GET")
-                    .build();
-
-            // create the action affordance
-            ActionAffordance getTelemetry = new ActionAffordance.Builder("getTelemetry", getTelemetryForm)
-                    .addTitle("Get telemetry")
-                    .build();
-
-            // create a new thing description for the artifact
-            ThingDescription tdTelemetry = (new ThingDescription.Builder("Interaction with db"))
-                    .addThingURI("coap://db:7601/")
-                    .addAction(getTelemetry)
-                    .build();
-            String description = new TDGraphWriter(tdTelemetry)
-                    .write();
-
-            System.out.println(description);
-
-            // add td to the body
-            StringSchema schema = new StringSchema.Builder().build();
-            requestArtifact.setPrimitivePayload(schema, description);
-
-            TDHttpResponse responseArtifact = requestArtifact.execute();
-
-            System.out.println("Status code: " + responseArtifact.getStatusCode() + ". Thing Description was created.");
         } else {
             System.out.println("No action found");
         }

@@ -75,7 +75,7 @@ public class Launcher {
             requestArtifact.addHeader("X-Agent-WebID", "");
 
             // create a form to make a get request for the temperature
-            Form getTemperatureForm = new Form.Builder("http://db:7600/get/temperature")
+            Form getTemperatureForm = new Form.Builder("http://db:7600/temperatures/")
                 .setMethodName("GET")
                 .build();
 
@@ -86,7 +86,7 @@ public class Launcher {
 
             // create a new thing description for the artifact
             ThingDescription tdTemperature = (new ThingDescription.Builder("Interaction with db"))
-                .addThingURI("http://db:7600")
+                .addThingURI("http://db:7600/")
                 .addAction(getTemperature)
                 .build();
             String description = new TDGraphWriter(tdTemperature)

@@ -1,5 +1,6 @@
 package ch.unisg.orgmanager;
 
+import ch.unisg.orgmanager.config.CoapServerConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -14,6 +15,8 @@ public class OrgManagerApplication {
 		System.out.println("Setting up Moise");
 
 		System.out.println("Setting up Coap");
+		CoapServerConfig server = new CoapServerConfig(true, false, 5684);
+		server.start();
 
 		System.out.println("Setting up Yggdrasil");
 	}

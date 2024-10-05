@@ -1,14 +1,18 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:21
+FROM maven as build
 
-# Set the working directory in the container
-WORKDIR /app
+COPY . /app
 
-# Copy the .jar file into the container at /app
-COPY orgserver.jar orgserver.jar
 
-# Expose the port your application will run on (change if needed)
-EXPOSE 5683/udp
+RUN mvn install:install-file -Dfile=app/libs/moise.jar -DgroupId=org.jacamo -DartifactId=moise -Dversion=1.1 -Dpackaging=jar
 
-# Run the .jar file
-ENTRYPOINT ["java", "-jar", "orgserver.jar"]
+RUN mvn -f app/pom.xml clean package -DskipTests
+
+FROM openjdk:21-jdk
+
+COPY --from=build /app/target/OrgManager-0.0.1.jar ./OrgManager-0.0.1.jar
+
+COPY --from=build /app/src/main/resources/application.properties ./application.properties
+COPY --from=build /app/src/main/resources/metadata.ttl ./metadata.ttl
+COPY --from=build /app/src/main/resources/org.xml ./org.xml
+
+CMD ["java", "-jar", "OrgManager-0.0.1.jar", "--spring.config.location=application.properties"]

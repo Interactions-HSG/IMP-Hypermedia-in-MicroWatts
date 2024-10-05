@@ -14,6 +14,7 @@ public class OrgManagerApplication {
 
 		System.out.println("Setting up Moise");
 
+
 		System.out.println("Setting up Coap");
 		CoapServerConfig server = new CoapServerConfig(true, false, 5684);
 		server.start();

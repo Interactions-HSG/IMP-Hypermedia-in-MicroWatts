@@ -5,7 +5,8 @@ services:
     container_name: organization_manager
     #    environment:
     ports:
-      - "5683:5683/udp"
+      - "7500:7500"
+      - "5686:5686/udp"
     restart: always
     networks:
       - smart-buidling

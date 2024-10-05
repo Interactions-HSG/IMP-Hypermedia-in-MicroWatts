@@ -18,7 +18,7 @@ public class OrgManagerApplication {
 		MoiseConfig moise = new MoiseConfig("org.xml");
 
 		System.out.println("Setting up Coap");
-		CoapServerConfig server = new CoapServerConfig(true, false, 5684);
+		CoapServerConfig server = new CoapServerConfig(true, false, 5686);
 		server.start();
 
 		System.out.println("Setting up Yggdrasil");

@@ -29,8 +29,7 @@ public class YggdrasilConfig {
             Optional<ActionAffordance> action = tdWorkspace.getActionByName("createArtifact");
 
             if (action.isPresent()) {
-
-
+                
                 TDHttpRequest requestArtifact = new TDHttpRequest(action.get().getFirstForm()
                         .orElseThrow(),
                         TD.invokeAction);

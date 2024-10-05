@@ -1,0 +1,31 @@
+@prefix td: <https://www.w3.org/2019/wot/td#> .
+@prefix htv: <https://www.w3.org/2009/http#> .
+@prefix hctl: <https://www.w3.org/2019/wot/hypermedia#> .
+@prefix js: <https://www.w3.org/2019/wot/json-schema#> .
+
+<#artifact> a td:Thing;
+    td:hasActionAffordance [ a td:ActionAffordance;
+      td:name "adoptRoleCoap";
+      td:hasForm [
+          htv:methodName "POST";
+          hctl:hasTarget <coap://orgmanager:7500/roles>;
+          hctl:forContentType "application/json";
+          hctl:hasOperationType td:invokeAction
+        ]
+    ], [ a td:ActionAffordance;
+        td:name "adoptRoleHttp";
+        td:hasForm [
+            htv:methodName "POST";
+            hctl:hasTarget <http://orgmanager:7500/roles>;
+            hctl:forContentType "application/json";
+            hctl:hasOperationType td:invokeAction
+        ];
+        td:hasInputSchema [
+            a js:ObjectSchema;
+            js:properties [
+                a js:StringSchema;
+                js:propertyName "roleId"
+            ];
+        ];
+    ];
+.

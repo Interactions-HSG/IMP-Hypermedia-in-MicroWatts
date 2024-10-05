@@ -8,6 +8,7 @@ public class MoiseConfig {
     public MoiseConfig(String uri) {
         try {
             orgEntity = OE.createOE("smartBuilding", uri);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

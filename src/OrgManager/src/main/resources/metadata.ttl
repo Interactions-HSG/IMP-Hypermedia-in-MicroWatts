@@ -5,27 +5,30 @@
 
 <#artifact> a td:Thing;
     td:hasActionAffordance [ a td:ActionAffordance;
-      td:name "adoptRoleCoap";
-      td:hasForm [
-          htv:methodName "POST";
-          hctl:hasTarget <coap://orgmanager:7500/roles>;
-          hctl:forContentType "application/json";
-          hctl:hasOperationType td:invokeAction
-        ]
-    ], [ a td:ActionAffordance;
-        td:name "adoptRoleHttp";
+        td:name "adoptRole";
         td:hasForm [
-            htv:methodName "POST";
-            hctl:hasTarget <http://orgmanager:7500/roles>;
-            hctl:forContentType "application/json";
+            htv:methodName "POST" ;
+            hctl:hasTarget <coap://orgmanager:5686/roles> ;
+            hctl:forContentType "application/json" ;
             hctl:hasOperationType td:invokeAction
-        ];
-        td:hasInputSchema [
-            a js:ObjectSchema;
-            js:properties [
-                a js:StringSchema;
-                js:propertyName "roleId"
-            ];
-        ];
+        ], [
+            htv:methodName "POST" ;
+            hctl:hasTarget <http://orgmanager:7500/roles> ;
+            hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction
+        ]
+    ], [
+        td:name "addAgent";
+        td:hasForm [
+            htv:methodName "POST" ;
+            hctl:hasTarget <coap://orgmanager:5686/agents> ;
+            hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction
+        ], [
+            htv:methodName "POST" ;
+            hctl:hasTarget <http://orgmanager:7500/agents> ;
+            hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction
+        ]
     ];
 .

@@ -3,28 +3,45 @@
 
 ![drawio image](documentation/images/layout.drawio.png)
 
+## Introduction
+Smart Buildings could be a lot smarter if the sensors could act with some degree of autonomy. Most sensor nowadays
+are strong enough to run an agent based program that could make decisions dynamically and depending on exterior factors.
+Currently, the power of these sensors is not used to its full potential. With this project we want to demonstrate, that not
+only will using an agent based approach make the system more robust and flexible, but it should also be more energy efficient.
+
+
+## Demo
+If you run the docker compose file you will see that some services will be created. It will spin up an instance of yggdrasil,
+that will enable the hypermedia driven capabilities. The other services will also be started and do their initial setup.
+The OrgManager and Datalake will create an artifact in the root workspace of yggdrasil. This will enable other agents to find
+the endpoints that are of interest to them. The SensingAgent for example looks for the datalake service and tries to find the
+endpoint where it can send its data to. Additionally it will join the workspace that represents the room in the building where
+it has been placed.
+
 ## ROADMAP
 The rough steps to make this project a success
 
-- [ ] Finish setting up the embedded systems development environment
+- [x] Finish setting up the embedded systems development environment
+- [x] Implement rudimentary Sensing Agent that can find datalake at runtime
 - [ ] Implement rudimentary Sensing Agent that dynamically registers itself with the organisation
 - [ ] Implement Organisation Manager that adds itself to the Yggdrasil instance so it may be found
-- [ ] Implement coAP functionality in Yggdrasil
-- [ ] Create Digital Twins of embedded agents
+- [x] Implement coAP functionality in Yggdrasil
+- [x] Sensing Agent joins his workspace, metadata that describes the agent is added.
 - [ ] Increase complexity of embedded bdi agents
 - [ ] Whole system dynamic and operable
 - [ ] Add demos that illustrate flexibility and robustness of chosen architecture
 
 
 ### Yggdrasil TO-DOs
-- [ ] Set up new vertx verticle that acts as coAP server
-- [ ] Functionality shoud be same as over HTTP
-- [ ] Add functionality to expand #platform representation so that e.g. orgManager is easily found
+- [x] Set up new vertx verticle that acts as coAP server
+- [x] Functionality shoud be same as over HTTP (restricted)
+- [x] Add functionality to expand #platform representation so that e.g. orgManager is easily found -> Root level workspace (later .well-known endpoint)
 
 ### Yggdrasil Roadblocks
 - [ ] What to do with base uri ? If coAP agent disregards base Uri and just uses the paths it works. 
 But that would mean that the agent cannot take the actual uris advertised in the representations.
-- [ ] How should request payloads look like? /join uses http headers
+-> Create both representations in yggdrasil. Coap representations could not advertise HTTP methods.
+- [x] How should request payloads look like? /join uses http headers -> coap has options. Currently using 500 and 600
 - [ ] Should we add another representation factory that gives tds specifically for coap?
 
 

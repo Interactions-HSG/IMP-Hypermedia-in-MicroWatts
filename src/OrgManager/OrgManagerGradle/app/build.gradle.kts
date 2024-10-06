@@ -10,32 +10,41 @@ plugins {
     application
     // Apply the Java plugin to add support for building Java applications.
     java
-    // shadowJar
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    // Apply Shadow plugin to create a fat jar
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
     maven { url = uri("https://jitpack.io") }
+
 }
 
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.10.1")
 
-    // This dependency is used by the application.
-    implementation(libs.guava)
+    // https://mvnrepository.com/artifact/org.eclipse.californium/element-connector
+    implementation("org.eclipse.californium:element-connector:3.7.0")
+// https://mvnrepository.com/artifact/org.eclipse.californium/element-connector-tcp-netty
+    implementation("org.eclipse.californium:element-connector-tcp-netty:3.7.0")
+
+
+    implementation(files("libs/moise-1.0.jar"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation(libs.californium)
     implementation("com.github.Interactions-HSG:wot-td-java:master-SNAPSHOT")
     implementation("org.eclipse.rdf4j:rdf4j-model:5.0.1")
     implementation("org.eclipse.rdf4j:rdf4j-rio-turtle:5.0.1")
     implementation(libs.slf4j.api)
     implementation(libs.slf4j.static)
+
+    // This dependency is used by the application.
+    implementation(libs.guava)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -47,7 +56,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "org.example.Launcher"
 }
 
 tasks.named<Test>("test") {

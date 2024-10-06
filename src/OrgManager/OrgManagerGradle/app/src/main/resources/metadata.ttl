@@ -1,4 +1,5 @@
 @prefix td: <https://www.w3.org/2019/wot/td#> .
+@prefix hmas: <https://purl.org/hmas/> .
 @prefix htv: <https://www.w3.org/2011/http#> .
 @prefix hctl: <https://www.w3.org/2019/wot/hypermedia#> .
 @prefix js: <https://www.w3.org/2019/wot/json-schema#> .
@@ -10,7 +11,7 @@
         td:name "getSensorData";
         td:hasForm [
             htv:methodName "GET";
-            hctl:hasTarget <fillInDatalakeTarget>;
+            hctl:hasTarget <http://localhost:8080/sensor>;
             hctl:forContentType "application/json";
             hctl:hasOperationType td:invokeAction
         ];
@@ -22,3 +23,6 @@
             ];
         ];
     ].
+
+<> hmas:isProfileOf <coap://org:5686>.
+<coap://org:5686> a td:OrgManager.

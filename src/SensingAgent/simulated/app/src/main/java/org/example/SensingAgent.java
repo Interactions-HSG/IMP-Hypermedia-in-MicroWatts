@@ -4,25 +4,35 @@ import static org.eclipse.rdf4j.model.util.Values.iri;
 
 import ch.unisg.ics.interactions.wot.td.ThingDescription;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
+import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.elements.exception.ConnectorException;
 
 public class SensingAgent extends CoapServer {
 
+  private final String sensorId = "1";
   private final String ENTRYPOINT;
-  private final String metadata;
-  private String location;
+  private String metadata;
+  private final String location;
   private String locationUri;
   private String baseUriYggdrasil;
   private String dbPostSensorDataUri;
+  private String orgManagerUri;
 
   private boolean running = false;
+  private ScheduledExecutorService scheduler;
 
   public SensingAgent(String entrypoint, String metadata, String room) {
     super(5684);
@@ -32,21 +42,17 @@ public class SensingAgent extends CoapServer {
     this.locationUri = null;
   }
 
+  @Override
+  protected Resource createRoot() {
+    return new SensingAgentRootResource();
+  }
+
   public void run() throws ConnectorException, IOException {
     this.start();
     this.setup();
     running = true;
-    while (running) {
-      System.out.println("Sensing...");
-      sendSensingData();
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-    this.stop();
-    this.destroy();
+    scheduler = Executors.newScheduledThreadPool(1);
+    scheduler.scheduleAtFixedRate(this::sendSensingData, 0, 10, TimeUnit.SECONDS);
   }
 
   /**
@@ -58,21 +64,21 @@ public class SensingAgent extends CoapServer {
    */
   private void setup() throws ConnectorException, IOException {
     System.out.println("Setting up...");
-    final String platformRepresentation = sendCoapMessage(ENTRYPOINT);
-    final var td = TDGraphReader.
-        readFromString(ThingDescription.TDFormat.RDF_TURTLE, platformRepresentation);
-    baseUriYggdrasil = cleanUri(td.getThingURI().orElseThrow());
-    var joined = joinMyWorkspace();
-    while (!joined) {
-      System.out.println("Failed to join workspace");
+    String platformRepresentation = sendCoapMessage(ENTRYPOINT);
+    while(platformRepresentation == null) {
+      System.out.println("Failed to get platform representation");
+      platformRepresentation = sendCoapMessage(ENTRYPOINT);
       try {
         Thread.sleep(10000);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        System.err.println("Failed to sleep");
       }
-      joined = joinMyWorkspace();
     }
-    System.out.println("Joined workspace");
+    final var td = TDGraphReader.
+        readFromString(ThingDescription.TDFormat.RDF_TURTLE, platformRepresentation);
+    baseUriYggdrasil = cleanUri(td.getThingURI().orElseThrow());
+
+
 
     var dbFound = findDB();
     while (!dbFound) {
@@ -80,15 +86,48 @@ public class SensingAgent extends CoapServer {
       try {
         Thread.sleep(10000);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        System.err.println("Failed to sleep");
       }
       dbFound = findDB();
     }
     System.out.println("DB found");
+
+    var joined = joinMyWorkspace();
+    while (!joined) {
+      System.out.println("Failed to join workspace");
+      try {
+        Thread.sleep(10000);
+      } catch (InterruptedException e) {
+        System.err.println("Failed to sleep");
+      }
+      joined = joinMyWorkspace();
+    }
+    System.out.println("Joined workspace");
+
+    var orgFound = findOrg();
+    while (!orgFound) {
+      System.out.println("Failed to find Org");
+      try {
+        Thread.sleep(10000);
+      } catch (InterruptedException e) {
+        System.err.println("Failed to sleep");
+      }
+      orgFound = findOrg();
+    }
+
+    System.out.println("Org found");
+
+    joinOrg();
+
   }
 
   public void stopRunning() {
     running = false;
+    if (scheduler != null) {
+      scheduler.shutdown();
+    }
+    this.stop();
+    this.destroy();
   }
 
   private String sendCoapMessage(final String targetUri) throws ConnectorException, IOException {
@@ -119,6 +158,10 @@ public class SensingAgent extends CoapServer {
       return false;
     }
     final String DBRepresentation = sendCoapMessage(DBArtifactUri);
+    if (DBRepresentation == null) {
+      System.out.println("DB representation not found");
+      return false;
+    }
     final var dbTD = TDGraphReader
         .readFromString(ThingDescription.TDFormat.RDF_TURTLE, DBRepresentation);
 
@@ -129,19 +172,41 @@ public class SensingAgent extends CoapServer {
       return false;
     }
 
+    if (dbEndpoint.get().getFirstForm().isEmpty()) {
+      System.out.println("DB endpoint form not found");
+      return false;
+    }
     dbPostSensorDataUri = dbEndpoint.get().getFirstForm().get().getTarget();
     System.out.println("DB endpoint: " + dbEndpoint.get().getFirstForm().get().getTarget());
+
+    // [(SensorData, coap://datalake:5684/data)]
+
+
+    this.metadata = this.metadata
+        .replaceAll("<fillInDatalakeTarget>",
+            "<" + dbPostSensorDataUri + "?sensorId=" + this.sensorId + ">");
     return true;
   }
 
-  private void sendSensingData() throws ConnectorException, IOException {
+  private void sendSensingData() {
+    if(!running) {
+      return;
+    }
+    try {
     System.out.println("Sending sensing data...");
     final var coapClient = new CoapClient(dbPostSensorDataUri);
     Request request = new Request(CoAP.Code.POST, CoAP.Type.NON);
-    request.setPayload("\"temperature\":\"20\",\"humidity\":\"50\"");
+    final var randomTemperature = new Random().nextInt(30);
+    final var randomHumidity = new Random().nextInt(100);
+    request.setPayload("\"temperature\":\" "
+        + randomTemperature
+        + "\",\"humidity\":\""
+        + randomHumidity + "\"");
     coapClient.advanced(request); // or async version
     coapClient.shutdown();
-
+    } catch (Exception e) {
+      System.err.println("Failed to send sensing data: " + e.getMessage());
+    }
   }
 
   private boolean joinMyWorkspace() throws ConnectorException, IOException {
@@ -180,13 +245,77 @@ public class SensingAgent extends CoapServer {
     return true;
   }
 
+
+  private boolean findOrg() throws ConnectorException, IOException {
+    final String platformRepresentation = sendCoapMessage(ENTRYPOINT);
+    final String rootWorkspaceUri = getWorkspaceUri("root", platformRepresentation);
+
+    if (rootWorkspaceUri == null) {
+      System.out.println("root workspace not found");
+      return false;
+    }
+
+    final String rootWorkspaceRepresentation = sendCoapMessage(rootWorkspaceUri);
+    final String orgArtifactUri = getArtifactUri("OrgManager", rootWorkspaceRepresentation);
+    if (orgArtifactUri == null) {
+      System.out.println("OrgManager not found");
+      return false;
+    }
+    final String orgRepresentation = sendCoapMessage(orgArtifactUri);
+    if (orgRepresentation == null) {
+      System.out.println("OrgManager representation not found");
+      return false;
+    }
+    final var orgTD = TDGraphReader
+        .readFromString(ThingDescription.TDFormat.RDF_TURTLE, orgRepresentation);
+
+    final var orgEndpoint = orgTD.getGraph().get().filter(null,null,iri("https://www.w3" +
+        ".org/2019/wot/td#OrgManager"));
+
+    if (orgEndpoint.isEmpty()) {
+        System.out.println("Org endpoint not found");
+        return false;
+    }
+    orgEndpoint.subjects().stream().findFirst().ifPresent(s -> {
+      orgManagerUri = s.stringValue();
+    });
+    System.out.println("Org endpoint: " + orgManagerUri);
+    return true;
+  }
+
+  private void joinOrg() {
+    System.out.println("Joining org...");
+    System.out.println("Org endpoint: " + orgManagerUri);
+    Gson gson = new Gson();
+    try {
+      final var coapClient = new CoapClient(orgManagerUri + "/room1/rl-1");
+
+      PlayerInfo pi = new PlayerInfo();
+      pi.id = "sen-test";
+      pi.taskAllocation = 50;
+      String response =
+          coapClient.post(gson.toJson(pi), MediaTypeRegistry.APPLICATION_JSON).getCode().toString();
+      System.out.println("Response: " + response);
+
+    } catch (Exception e) {
+      System.err.println("Failed to join org: " + e.getMessage());
+    }
+  }
+
   private String getJoinFormUri(String workspaceName, String WorkspaceRepresentation) {
+    if (WorkspaceRepresentation == null) {
+      return null;
+    }
     ThingDescription td = TDGraphReader
         .readFromString(ThingDescription.TDFormat.RDF_TURTLE, WorkspaceRepresentation);
     final var joinWorkspaceAffordance = td.getActionByName("joinWorkspace");
     if (joinWorkspaceAffordance.isPresent()) {
       final var joinWorkspaceAction = joinWorkspaceAffordance.get();
       final var joinWorkspaceForm = joinWorkspaceAction.getFirstForm();
+        if (joinWorkspaceForm.isEmpty()) {
+            System.out.println("Join form not found");
+            return null;
+        }
       System.out.println("Join form found: " + joinWorkspaceForm.get().getTarget());
       return ENTRYPOINT + "workspaces/" + workspaceName + "/join";
     }
@@ -209,6 +338,9 @@ public class SensingAgent extends CoapServer {
   public String getArtifactUri(String artifactName, String workspaceRepresenation) {
     ThingDescription td =
         TDGraphReader.readFromString(ThingDescription.TDFormat.RDF_TURTLE, workspaceRepresenation);
+    if (td == null || td.getThingURI().isEmpty()) {
+      return null;
+    }
     final var workspaceUri = cleanUri(td.getThingURI().get());
     final var expectedArtifactURI = workspaceUri + "/artifacts/" + artifactName + "/#artifact";
     final var foundArtifact = findArtifactUri(td, expectedArtifactURI);
@@ -220,17 +352,23 @@ public class SensingAgent extends CoapServer {
   }
 
   public boolean findArtifactUri(ThingDescription td, final String expectedArtifactURI) {
+    if (td == null || td.getGraph().isEmpty()) {
+      return false;
+    }
     final var model = td.getGraph().get();
     final var t =
         model.filter(null, iri("https://purl.org/hmas/contains"), iri(expectedArtifactURI));
-    return t.size() > 0;
+    return !t.isEmpty();
   }
 
 
   public boolean findWorkspaceUri(ThingDescription td, final String expectedWorkspaceURI) {
+    if (td == null || td.getGraph().isEmpty()) {
+      return false;
+    }
     final var model = td.getGraph().get();
     final var t = model.filter(null, iri("https://purl.org/hmas/hosts"), iri(expectedWorkspaceURI));
-    return t.size() > 0;
+    return !t.isEmpty();
   }
 
   private String cleanUri(final String ucleanUri) {

@@ -18,9 +18,6 @@ WORKDIR /app/
 # Copy the build artifacts
 COPY --from=build /app .
 
-# Expose the port
-EXPOSE 8080
-
 WORKDIR /app/app/build/libs
 # Set the default command
 CMD ["java", "-jar", "app-all.jar"]

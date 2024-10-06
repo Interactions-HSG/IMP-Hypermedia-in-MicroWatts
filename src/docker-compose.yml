@@ -1,21 +1,21 @@
 services:
-  organization_manager:
+  org:
     build:
       context: ./OrgManager
-    container_name: organization_manager
-    #    environment:
+    container_name: org
+    environment:
+      - ENTRYPOINT=http://yggdrasil:8080/
     ports:
-      - "7500:7500"
+      - "8083:8083"
       - "5686:5686/udp"
     restart: always
     networks:
       - smart-buidling
 
-  data_lake:
-    container_name: data_lake
-    hostname: datalake
+  db:
+    container_name: db
     build:
-      context: ./DataLake
+      context: ./DB
     ports:
       - "7600:7600"
       - "5685:5685/udp"
@@ -56,6 +56,7 @@ services:
     container_name: sensing_agent
     environment:
       - ENTRYPOINT=coap://yggdrasil:5683/
+      - MY_ROOM=room1
     ports:
       - "8082:8082"
       - "5684:5684/udp"

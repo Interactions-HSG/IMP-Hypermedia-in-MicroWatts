@@ -21,7 +21,6 @@ public class OrgManagerApplication {
 		System.out.println("Setting up Coap");
 		CoapServerConfig server = new CoapServerConfig(true, false, 5686);
 		server.add(new RoleResource("roles"));
-		server.add(new Age)
 		server.start();
 
 		System.out.println("Setting up Yggdrasil");

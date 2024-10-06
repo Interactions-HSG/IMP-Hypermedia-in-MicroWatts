@@ -11,10 +11,11 @@ services:
     networks:
       - smart-buidling
 
-  db:
-    container_name: db
+  data_lake:
+    container_name: data_lake
+    hostname: datalake
     build:
-      context: ./DB
+      context: ./DataLake
     ports:
       - "7600:7600"
       - "5685:5685/udp"

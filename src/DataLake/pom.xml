@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ch.unisg</groupId>
-    <artifactId>DB</artifactId>
+    <artifactId>DataLake</artifactId>
     <version>0.0.1</version>
-    <name>DB</name>
-    <description>DB</description>
+    <name>DataLake</name>
+    <description>DataLake</description>
     <url/>
     <licenses>
         <license/>

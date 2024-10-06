@@ -3,7 +3,6 @@ package ch.unisg.db;
 import ch.unisg.db.config.DBServer;
 import ch.unisg.db.controllers.TelemetryController;
 import org.eclipse.californium.core.config.CoapConfig;
-import org.eclipse.californium.elements.config.Configuration;
 import org.eclipse.californium.elements.config.TcpConfig;
 import org.eclipse.californium.elements.config.UdpConfig;
 import org.springframework.boot.SpringApplication;
@@ -12,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.IOException;
 
 @SpringBootApplication
-public class DbApplication {
+public class DataLakeApplication {
 
     static {
         CoapConfig.register();
@@ -24,7 +23,7 @@ public class DbApplication {
 
         System.out.println("Starting server...");
 
-        SpringApplication.run(DbApplication.class, args);
+        SpringApplication.run(DataLakeApplication.class, args);
 
         /** set up yggdrasil */
         System.out.println("Setting up yggdrasil...");

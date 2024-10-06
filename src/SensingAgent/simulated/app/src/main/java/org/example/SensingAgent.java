@@ -22,8 +22,9 @@ import org.eclipse.californium.elements.exception.ConnectorException;
 
 public class SensingAgent extends CoapServer {
 
+  private final String sensorId = "1";
   private final String ENTRYPOINT;
-  private final String metadata;
+  private String metadata;
   private final String location;
   private String locationUri;
   private String baseUriYggdrasil;
@@ -50,8 +51,8 @@ public class SensingAgent extends CoapServer {
     this.start();
     this.setup();
     running = true;
-    //scheduler = Executors.newScheduledThreadPool(1);
-    //scheduler.scheduleAtFixedRate(this::sendSensingData, 0, 10, TimeUnit.SECONDS);
+    scheduler = Executors.newScheduledThreadPool(1);
+    scheduler.scheduleAtFixedRate(this::sendSensingData, 0, 10, TimeUnit.SECONDS);
   }
 
   /**
@@ -77,17 +78,7 @@ public class SensingAgent extends CoapServer {
         readFromString(ThingDescription.TDFormat.RDF_TURTLE, platformRepresentation);
     baseUriYggdrasil = cleanUri(td.getThingURI().orElseThrow());
 
-    var joined = joinMyWorkspace();
-    while (!joined) {
-      System.out.println("Failed to join workspace");
-      try {
-        Thread.sleep(10000);
-      } catch (InterruptedException e) {
-        System.err.println("Failed to sleep");
-      }
-      joined = joinMyWorkspace();
-    }
-    System.out.println("Joined workspace");
+
 
     var dbFound = findDB();
     while (!dbFound) {
@@ -100,6 +91,18 @@ public class SensingAgent extends CoapServer {
       dbFound = findDB();
     }
     System.out.println("DB found");
+
+    var joined = joinMyWorkspace();
+    while (!joined) {
+      System.out.println("Failed to join workspace");
+      try {
+        Thread.sleep(10000);
+      } catch (InterruptedException e) {
+        System.err.println("Failed to sleep");
+      }
+      joined = joinMyWorkspace();
+    }
+    System.out.println("Joined workspace");
 
     var orgFound = findOrg();
     while (!orgFound) {
@@ -175,6 +178,13 @@ public class SensingAgent extends CoapServer {
     }
     dbPostSensorDataUri = dbEndpoint.get().getFirstForm().get().getTarget();
     System.out.println("DB endpoint: " + dbEndpoint.get().getFirstForm().get().getTarget());
+
+    // [(SensorData, coap://datalake:5684/data)]
+
+
+    this.metadata = this.metadata
+        .replaceAll("<fillInDatalakeTarget>",
+            "<" + dbPostSensorDataUri + "?sensorId=" + this.sensorId + ">");
     return true;
   }
 

@@ -10,7 +10,7 @@
         td:name "getSensorData";
         td:hasForm [
             htv:methodName "GET";
-            hctl:hasTarget <http://localhost:8080/sensor>;
+            hctl:hasTarget <fillInDatalakeTarget>;
             hctl:forContentType "application/json";
             hctl:hasOperationType td:invokeAction
         ];

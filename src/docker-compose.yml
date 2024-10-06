@@ -64,6 +64,16 @@ services:
         - smart-buidling
     restart: on-failure
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    hostname: frontend
+    ports:
+      - "4000:4000"
+    networks:
+      - smart-buidling
+
 networks:
     smart-buidling:
         driver: bridge

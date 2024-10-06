@@ -2,7 +2,6 @@ package org.example;
 
 import org.eclipse.californium.core.CoapServer;
 import org.example.entities.Group;
-import org.example.entities.GroupRole;
 
 public class AGRServer extends CoapServer{
 

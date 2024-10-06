@@ -12,8 +12,8 @@ services:
     networks:
       - smart-buidling
 
-  db:
-    container_name: db
+  datalake:
+    container_name: datalake
     build:
       context: ./DataLake
     ports:

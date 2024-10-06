@@ -1,11 +1,13 @@
 services:
-  organization_manager:
+  org:
     build:
       context: ./OrgManager
-    container_name: organization_manager
-    #    environment:
+    container_name: org
+    environment:
+      - ENTRYPOINT=http://yggdrasil:8080/
     ports:
-      - "5683:5683/udp"
+      - "8083:8083"
+      - "5686:5686/udp"
     restart: always
     networks:
       - smart-buidling

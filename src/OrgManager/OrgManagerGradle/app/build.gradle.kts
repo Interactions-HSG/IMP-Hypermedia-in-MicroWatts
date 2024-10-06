@@ -8,6 +8,10 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    // Apply the Java plugin to add support for building Java applications.
+    java
+    // Apply Shadow plugin to create a fat jar
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
@@ -25,7 +29,9 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     // https://mvnrepository.com/artifact/org.eclipse.californium/element-connector
-    implementation("org.eclipse.californium:element-connector:3.12.0")
+    implementation("org.eclipse.californium:element-connector:3.7.0")
+// https://mvnrepository.com/artifact/org.eclipse.californium/element-connector-tcp-netty
+    implementation("org.eclipse.californium:element-connector-tcp-netty:3.7.0")
 
 
     implementation(files("libs/moise-1.0.jar"))
@@ -50,7 +56,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "org.example.Launcher"
 }
 
 tasks.named<Test>("test") {

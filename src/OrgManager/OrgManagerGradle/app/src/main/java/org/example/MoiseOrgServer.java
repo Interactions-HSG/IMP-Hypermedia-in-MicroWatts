@@ -2,6 +2,8 @@ package org.example;
 
 import com.google.gson.Gson;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +31,7 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.elements.config.Configuration;
+import org.eclipse.californium.elements.tcp.netty.TcpServerConnector;
 import org.eclipse.californium.elements.util.NetworkInterfacesUtil;
 
 public class MoiseOrgServer extends CoapServer {
@@ -56,7 +59,7 @@ public class MoiseOrgServer extends CoapServer {
 	static Gson gson = new Gson();
 	
 	public MoiseOrgServer(int port) throws SocketException {
-		super(port);
+		addEndpoint(true, false, port);
 		try {
 			orgSpec = OS.loadOSFromURI(Launcher.fileName);
 			orgEntity = new OE(new GoalInstance(new Goal("blah"), null), orgSpec);
@@ -93,7 +96,27 @@ public class MoiseOrgServer extends CoapServer {
 		addOEGroups();
 		System.out.println("OrgServer is now ready. Browse to coap://<inteface>:" + (port));
 	}
-	
+
+	private void addEndpoint(boolean udp, boolean tcp, int port) {
+		Configuration configuration = Configuration.getStandard();
+		for (InetAddress addr : NetworkInterfacesUtil.getNetworkInterfaces()) {
+			InetSocketAddress bindToAddress = new InetSocketAddress(addr, port);
+			if (udp) {
+				CoapEndpoint.Builder builder = new CoapEndpoint.Builder();
+				builder.setInetSocketAddress(bindToAddress);
+				builder.setConfiguration(configuration);
+				addEndpoint(builder.build());
+			}
+			if (tcp) {
+				TcpServerConnector connector = new TcpServerConnector(bindToAddress, configuration);
+				CoapEndpoint.Builder builder = new CoapEndpoint.Builder();
+				builder.setConnector(connector);
+				builder.setConfiguration(configuration);
+				addEndpoint(builder.build());
+			}
+		}
+	}
+
 	private void addOSRoles() {
 		for(Role role : orgSpec.getSS().getRolesDef()) {
 			osroles.add(new OSResource(role));

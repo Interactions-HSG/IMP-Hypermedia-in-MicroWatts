@@ -4,6 +4,7 @@ import static org.eclipse.rdf4j.model.util.Values.iri;
 
 import ch.unisg.ics.interactions.wot.td.ThingDescription;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
@@ -26,6 +28,7 @@ public class SensingAgent extends CoapServer {
   private String locationUri;
   private String baseUriYggdrasil;
   private String dbPostSensorDataUri;
+  private String orgManagerUri;
 
   private boolean running = false;
   private ScheduledExecutorService scheduler;
@@ -47,8 +50,8 @@ public class SensingAgent extends CoapServer {
     this.start();
     this.setup();
     running = true;
-    scheduler = Executors.newScheduledThreadPool(1);
-    scheduler.scheduleAtFixedRate(this::sendSensingData, 0, 10, TimeUnit.SECONDS);
+    //scheduler = Executors.newScheduledThreadPool(1);
+    //scheduler.scheduleAtFixedRate(this::sendSensingData, 0, 10, TimeUnit.SECONDS);
   }
 
   /**
@@ -97,6 +100,22 @@ public class SensingAgent extends CoapServer {
       dbFound = findDB();
     }
     System.out.println("DB found");
+
+    var orgFound = findOrg();
+    while (!orgFound) {
+      System.out.println("Failed to find Org");
+      try {
+        Thread.sleep(10000);
+      } catch (InterruptedException e) {
+        System.err.println("Failed to sleep");
+      }
+      orgFound = findOrg();
+    }
+
+    System.out.println("Org found");
+
+    joinOrg();
+
   }
 
   public void stopRunning() {
@@ -214,6 +233,63 @@ public class SensingAgent extends CoapServer {
     this.locationUri = myWorkspaceUri;
     coapClient.shutdown();
     return true;
+  }
+
+
+  private boolean findOrg() throws ConnectorException, IOException {
+    final String platformRepresentation = sendCoapMessage(ENTRYPOINT);
+    final String rootWorkspaceUri = getWorkspaceUri("root", platformRepresentation);
+
+    if (rootWorkspaceUri == null) {
+      System.out.println("root workspace not found");
+      return false;
+    }
+
+    final String rootWorkspaceRepresentation = sendCoapMessage(rootWorkspaceUri);
+    final String orgArtifactUri = getArtifactUri("OrgManager", rootWorkspaceRepresentation);
+    if (orgArtifactUri == null) {
+      System.out.println("OrgManager not found");
+      return false;
+    }
+    final String orgRepresentation = sendCoapMessage(orgArtifactUri);
+    if (orgRepresentation == null) {
+      System.out.println("OrgManager representation not found");
+      return false;
+    }
+    final var orgTD = TDGraphReader
+        .readFromString(ThingDescription.TDFormat.RDF_TURTLE, orgRepresentation);
+
+    final var orgEndpoint = orgTD.getGraph().get().filter(null,null,iri("https://www.w3" +
+        ".org/2019/wot/td#OrgManager"));
+
+    if (orgEndpoint.isEmpty()) {
+        System.out.println("Org endpoint not found");
+        return false;
+    }
+    orgEndpoint.subjects().stream().findFirst().ifPresent(s -> {
+      orgManagerUri = s.stringValue();
+    });
+    System.out.println("Org endpoint: " + orgManagerUri);
+    return true;
+  }
+
+  private void joinOrg() {
+    System.out.println("Joining org...");
+    System.out.println("Org endpoint: " + orgManagerUri);
+    Gson gson = new Gson();
+    try {
+      final var coapClient = new CoapClient(orgManagerUri + "/room1/rl-1");
+
+      PlayerInfo pi = new PlayerInfo();
+      pi.id = "sen-test";
+      pi.taskAllocation = 50;
+      String response =
+          coapClient.post(gson.toJson(pi), MediaTypeRegistry.APPLICATION_JSON).getCode().toString();
+      System.out.println("Response: " + response);
+
+    } catch (Exception e) {
+      System.err.println("Failed to join org: " + e.getMessage());
+    }
   }
 
   private String getJoinFormUri(String workspaceName, String WorkspaceRepresentation) {

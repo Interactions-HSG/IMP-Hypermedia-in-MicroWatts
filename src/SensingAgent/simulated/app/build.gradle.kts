@@ -26,6 +26,8 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    implementation("com.google.code.gson:gson:2.10.1")
+
     // This dependency is used by the application.
     implementation(libs.guava)
     implementation(libs.californium)

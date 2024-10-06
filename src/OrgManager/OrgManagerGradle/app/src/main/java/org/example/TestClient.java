@@ -16,7 +16,7 @@ public class TestClient extends Thread {
     static long avg_response_time = 0;
     static long samples = 0;
 
-    CoapClient client = new CoapClient("coap://10.0.1.10:5683/room1");
+    CoapClient client = new CoapClient("coap://10.0.1.10:5686/room1");
     public void run() {
         //System.out.println("This code is running in a thread");
         String response = null;
@@ -45,7 +45,7 @@ public class TestClient extends Thread {
     }
 
     public static void addDemoPlayer(){
-        CoapClient client = new CoapClient("coap://localhost:5683/room1/rl-1");
+        CoapClient client = new CoapClient("coap://localhost:5686/room1/rl-1");
         System.out.println("Add demo player");
         Gson gson = new Gson();
         PlayerInfo pi = new PlayerInfo();
@@ -62,7 +62,7 @@ public class TestClient extends Thread {
     }
 
     public static void removeDemoPlayer(){
-        CoapClient client = new CoapClient("coap://localhost:5683/room1/rl-1/sen-test");
+        CoapClient client = new CoapClient("coap://localhost:5686/room1/rl-1/sen-test");
         System.out.println("Remove demo player");
         try {
             String response = client.delete().getCode().toString();
@@ -75,7 +75,7 @@ public class TestClient extends Thread {
     }
 
     public static void createDemoRole(){
-        CoapClient client = new CoapClient("coap://localhost:5683/room1");
+        CoapClient client = new CoapClient("coap://localhost:5686/room1");
         System.out.println("SYNCHRONOUS");
         Gson gson = new Gson();
         // synchronous
@@ -112,7 +112,7 @@ public class TestClient extends Thread {
 
 */
             //Query role player
-            client.setURI("coap://localhost:5683/room1/gr_comfort_sensing/ag1");
+            client.setURI("coap://localhost:5686/room1/gr_comfort_sensing/ag1");
             response = client.get().getResponseText();
             System.out.println("Get ag1: " + response);
 

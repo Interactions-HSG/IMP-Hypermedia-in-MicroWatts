@@ -1,0 +1,28 @@
+@prefix td: <https://www.w3.org/2019/wot/td#> .
+@prefix hmas: <https://purl.org/hmas/> .
+@prefix htv: <https://www.w3.org/2011/http#> .
+@prefix hctl: <https://www.w3.org/2019/wot/hypermedia#> .
+@prefix js: <https://www.w3.org/2019/wot/json-schema#> .
+
+
+<#artifact> a td:Thing;
+    td:hasActionAffordance [
+        a td:ActionAffordance;
+        td:name "getSensorData";
+        td:hasForm [
+            htv:methodName "GET";
+            hctl:hasTarget <http://localhost:8080/sensor>;
+            hctl:forContentType "application/json";
+            hctl:hasOperationType td:invokeAction
+        ];
+        td:hasInputSchema [
+            a js:ObjectSchema;
+            js:properties [
+                a js:NumberSchema;
+                js:propertyName "sensorId"
+            ];
+        ];
+    ].
+
+<> hmas:isProfileOf <coap://org:5686>.
+<coap://org:5686> a td:OrgManager.

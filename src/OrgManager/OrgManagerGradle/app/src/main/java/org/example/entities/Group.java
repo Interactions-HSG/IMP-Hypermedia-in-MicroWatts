@@ -42,6 +42,7 @@ public class Group extends CoapResource {
 
     private GroupRole getEquivalent(GroupRoleInfo spec){
         for(Resource res : this.getChildren()) {
+            System.out.println("Res: " + res.getName());
             GroupRole gr = (GroupRole)res;
             if(gr.specification.equals(spec)){
                 return gr;
@@ -56,14 +57,10 @@ public class Group extends CoapResource {
         // respond to the request
         GroupRoleInfo spec = gson.fromJson(data, GroupRoleInfo.class);
         GroupRole equiv = getEquivalent(spec);
-        if(equiv != null) {
             addGroupRole(spec);
             exchange.respond(CoAP.ResponseCode.CREATED);
             changed();
-        }else{
-            exchange.respond(CoAP.ResponseCode.CONFLICT, equiv.getURI());
         }
-    }
 
     public void signalChange(){
         changed();

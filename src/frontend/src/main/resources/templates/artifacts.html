@@ -1,3 +1,18 @@
-<div>
-    <p>TEST</p>
-</div>
+<button class="w3-border w3-border-black w3-margin w3-center"
+     style="width: 75px; height: 25px;"
+     onclick="toggle(['workspaces', 'artifacts']);changeTitle('yggdrasil/workspaces')"
+>
+    Back
+</button>
+<ul class="w3-ul">
+    <li th:each="artifact : ${artifacts}">
+        <button class="w3-button w3-light-gray w3-round-xxlarge"
+                th:text="${artifact.key}"
+                onclick="toggle(['artifacts','actions']);changeTitle('yggdrasil/workspaces/artifacts/actions')"
+                th:hx-get="'/artifacts/actions?artifactURI=' + ${artifact.value}"
+                hx-trigger="click"
+                hx-target="#actions-links"
+                hx-swap="innerHTML"
+        ></button>
+    </li>
+</ul>

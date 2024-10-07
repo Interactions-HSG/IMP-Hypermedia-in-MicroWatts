@@ -1,0 +1,15 @@
+
+<button class="w3-border w3-border-black w3-margin w3-center"
+     style="width: 75px; height: 25px;"
+     onclick="toggle(['artifacts', 'actions']);changeTitle('yggdrasil/workspaces/artifacts')"
+>Back</button>
+
+<ul class="w3-ul">
+    <li th:each="action : ${actions}">
+        <button class="w3-button w3-light-gray w3-round-xxlarge"
+                th:text="${action.key}"
+                onclick="toggleNotification()"
+
+        ></button>
+    </li>
+</ul>

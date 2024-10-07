@@ -12,7 +12,7 @@
 <body>
 
     <header class="w3-container w3-card">
-        <h1 th:text="${location}"></h1>
+        <h1 id = "location" th:text="${location}"></h1>
     </header>
 
     <div class="w3-container">
@@ -20,30 +20,21 @@
         <div class="w3-cell-row w3-hide w3-show" id="workspaces">
 
             <div class="" id="workspaces-links">
-                <h3>Workspaces:</h3>
-                <ul>
+
+                <ul class="w3-ul">
                     <li th:each="workspace : ${workspaces}">
-                        <button class="w3-button"
+                        <button class="w3-button w3-light-gray w3-round-xxlarge"
                                 th:text="${workspace.key}"
-                                onclick="toggle(['workspaces','artifacts'])"
-                                hx-get="/artifacts"
+                                onclick="toggle(['workspaces','artifacts']);changeTitle('yggdrasil/workspaces/artifacts')"
+                                th:hx-get="'/artifacts?workspaceURI=' + ${workspace.value}"
                                 hx-trigger="click"
-                                hx-target="#artifacts-linkstest"
+                                hx-target="#artifacts-links"
                                 hx-swap="innerHTML"
                         ></button>
                     </li>
 
                 </ul>
             </div>
-
-            <div class="" id="workspaces-buttons">
-                <button hx-get="/"
-                        hx-trigger="click"
-                        hx-target="#artifacts-links"
-                        hx-swap="innerHTML"
-                >Get Sensor Data</button>
-            </div>
-
         </div>
 
         <div class="w3-cell-row w3-hide" id="artifacts">
@@ -52,32 +43,28 @@
                 <p>Links</p>
             </div>
 
-            <div class="" id="artifacts-linkstest">
-                <p>Links</p>
-            </div>
-
             <div class="" id="artifacts-buttons">
-                <p>Artifacts</p>
+                <p></p>
             </div>
 
         </div>
 
-        <div class="w3-cell-row w3-hide" id="agents">
+        <div class="w3-cell-row w3-hide" id="actions">
 
-            <div class="" id="agents-links">
-                <p>Links</p>
+            <div class="" id="actions-links">
+                <p></p>
             </div>
 
-            <div class="" id="agents-buttons">
-                <p>agents</p>
+            <div class="" id="actions-buttons">
+                <p></p>
             </div>
 
         </div>
 
         <div class="w3-cell-row" id="console">
             <div class="w3-margin">
-                <div class="w3-border w3-border-black" style="width: 100%; height: 200px">
-                    <p></p>
+                <div class="w3-border w3-border-black w3-padding" style="width: 100%; height: 200px">
+                    <p>Demo: Information may be printed here.</p>
                 </div>
             </div>
         </div>
@@ -96,6 +83,11 @@
                 x.className = x.className.replace(" w3-show", "");
             }
         });
+    }
+
+    function changeTitle(location) {
+        var x = document.getElementById("location");
+        x.innerText = location;
     }
 </script>
 </html>

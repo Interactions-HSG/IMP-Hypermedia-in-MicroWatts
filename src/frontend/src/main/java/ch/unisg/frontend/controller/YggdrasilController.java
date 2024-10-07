@@ -4,23 +4,16 @@ package ch.unisg.frontend.controller;
 import ch.unisg.frontend.service.YggdrasilService;
 import ch.unisg.ics.interactions.wot.td.ThingDescription;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
-import org.eclipse.rdf4j.model.IRI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 import static org.eclipse.rdf4j.model.util.Values.iri;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.rdf4j.model.Statement;
 
 @Controller
 public class YggdrasilController {
@@ -67,7 +60,7 @@ public class YggdrasilController {
             e.printStackTrace();
         }
 
-        model.addAttribute("location", "yggdrasil/");
+        model.addAttribute("location", "yggdrasil/workspaces");
         model.addAttribute("workspaces", workspaces);
 
         return "index";

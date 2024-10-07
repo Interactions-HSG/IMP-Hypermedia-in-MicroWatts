@@ -1,16 +1,75 @@
 package ch.unisg.frontend.controller;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequiredArgsConstructor
+import ch.unisg.frontend.service.YggdrasilService;
+import ch.unisg.ics.interactions.wot.td.ThingDescription;
+import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
+import org.eclipse.rdf4j.model.IRI;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+
+import static org.eclipse.rdf4j.model.util.Values.iri;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.eclipse.rdf4j.model.Statement;
+
+@Controller
 public class YggdrasilController {
 
+    private final YggdrasilService yggdrasilService;
+
+    private final String yggdrasilBaseURI = "http://yggdrasil:8080/";
+
+    @Autowired
+    public YggdrasilController(YggdrasilService yggdrasilService) {
+        this.yggdrasilService = yggdrasilService;
+    }
+
     @GetMapping(path = "/")
-    public ResponseEntity<String> yggdrasil() {
-        return ResponseEntity.ok("Yggdrasil");
+    public String yggdrasil(Model model) {
+
+        HashMap<String, String> workspaces = new HashMap<>();
+
+        try {
+            ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, yggdrasilBaseURI);
+            final var graphModel = td.getGraph().get();
+
+            final var artifacts = graphModel.filter(null, iri("https://purl.org/hmas/hosts"), null);
+
+            if (artifacts.isEmpty()) {
+                System.out.println("No workspace exists");
+            } else {
+
+                artifacts.objects().forEach(artifact -> {
+                    System.out.println("Found workspace: " + artifact.stringValue());
+
+                    Pattern pattern = Pattern.compile("workspaces/(.*?)/");
+                    Matcher matcher = pattern.matcher(artifact.stringValue());
+
+                    if (matcher.find()) {
+                        String name = matcher.group(1);
+                        workspaces.put(name, artifact.stringValue());
+
+                    }
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        model.addAttribute("location", "yggdrasil/");
+        model.addAttribute("workspaces", workspaces);
+
+        return "index";
     }
 }

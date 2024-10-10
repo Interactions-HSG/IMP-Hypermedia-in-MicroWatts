@@ -15,7 +15,8 @@
 mas automationagent {
 
     agent bob: automation_agent.asl {
-      focus: w.c1 
+      focus: w.c1
+      beliefs: entrypoint("http://yggdrasil:8080/")
     }
 
     workspace w {

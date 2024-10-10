@@ -1,7 +1,6 @@
 // Agent sample_agent in project automationagent
 
 /* Initial beliefs and rules */
-entrypoint("http://yggdrasil:8080/").
 
 /* Initial goals */
 
@@ -32,7 +31,7 @@ entrypoint("http://yggdrasil:8080/").
        .print("Could not find entrypoint, trying again next cycle.");
        .random([10000,20000,50000],X);
        .wait(X);
-       !findOrganisation.
+       !findHyperMediaEnvironment.
 
 
 // Plan for if we do not find the root uri 

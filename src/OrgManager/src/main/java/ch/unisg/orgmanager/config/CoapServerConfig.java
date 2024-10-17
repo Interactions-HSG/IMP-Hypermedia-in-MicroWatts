@@ -1,5 +1,6 @@
 package ch.unisg.orgmanager.config;
 
+import ch.unisg.orgmanager.core.entity.Organization;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.core.network.CoapEndpoint;
@@ -20,8 +21,14 @@ public class CoapServerConfig extends CoapServer {
         TcpConfig.register();
     }
 
+    private static final CoapServerConfig server = new CoapServerConfig(true, false, 5686);
+
     public CoapServerConfig(boolean udp, boolean tcp, int port) {
         addEndpoint(true, false, port);
+    }
+
+    public static CoapServerConfig getInstance() {
+        return server;
     }
 
     private void addEndpoint(boolean udp, boolean tcp, int port) {

@@ -3,18 +3,20 @@ package ch.unisg.orgmanager.controller.coap;
 import ch.unisg.orgmanager.config.CoapServerConfig;
 import ch.unisg.orgmanager.core.port.in.RoleUseCase;
 import ch.unisg.orgmanager.core.service.RoleService;
+import moise.xml.DOMUtils;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.eclipse.californium.core.server.resources.Resource;
 
-public class RoleResource extends CoapResource {
+public class RolesResource extends CoapResource {
 
     private final RoleUseCase roleUseCase;
     private final CoapServerConfig server;
 
-    public RoleResource(String name) {
+    public RolesResource(String name) {
         super(name);
         this.roleUseCase = new RoleService();
         this.server = CoapServerConfig.getInstance();
@@ -25,24 +27,24 @@ public class RoleResource extends CoapResource {
 
         Request request = exchange.advanced().getRequest();
 
+        String roles = roleUseCase.getRoles();
+
         Response response = new Response(CoAP.ResponseCode.CONTENT);
-        response.setPayload("Hello World!");
+        response.setPayload(roles);
 
         exchange.respond(response);
     }
 
     @Override
     public void handlePOST(CoapExchange exchange) {
-        /*
-            Agent adopts a role
-         */
 
         Request request = exchange.advanced().getRequest();
 
-        roleUseCase.adoptRole(request.getPayloadString(), "role_lifesafety_sensor");
+        Resource roles = server.getRoot().getChild("roles");
+        roles.add(new RoleResource(request.getPayloadString()));
 
         Response response = new Response(CoAP.ResponseCode.CONTENT);
-        response.setPayload("Role adopted.");
+        response.setPayload("Test!");
         exchange.respond(response);
 
         // TODO: Add agent to role

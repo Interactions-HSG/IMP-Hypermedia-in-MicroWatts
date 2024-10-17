@@ -15,4 +15,6 @@ COPY --from=build /app/src/main/resources/application.properties ./application.p
 COPY --from=build /app/src/main/resources/metadata.ttl ./metadata.ttl
 COPY --from=build /app/src/main/resources/org.xml ./org.xml
 
+EXPOSE 5685/udp
+
 CMD ["java", "-jar", "OrgManager-0.0.1.jar", "--spring.config.location=application.properties"]

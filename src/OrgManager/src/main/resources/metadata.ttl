@@ -4,6 +4,7 @@
 @prefix js: <https://www.w3.org/2019/wot/json-schema#> .
 
 <#artifact> a td:Thing;
+
     td:hasActionAffordance [ a td:ActionAffordance;
         td:name "adoptRole";
         td:hasForm [
@@ -18,6 +19,17 @@
             hctl:hasOperationType td:invokeAction
         ]
     ], [
+        td:name "getRoles" ;
+        td:hasForm [
+            htv:methodName "GET" ;
+            hctl:hasTarget <coap://orgmanager:5686/roles> ;
+            hctl:hasOperationType td:invokeAction
+        ], [
+            htv:methodName "GET" ;
+            hctl:hasTarget <http://orgmanager:5686/roles> ;
+            hctl:hasOperationType td:invokeAction
+        ]
+    ], [
         td:name "addAgent";
         td:hasForm [
             htv:methodName "POST" ;
@@ -28,6 +40,17 @@
             htv:methodName "POST" ;
             hctl:hasTarget <http://orgmanager:7500/agents> ;
             hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction
+        ]
+    ], [
+        td:name "getAgents";
+        td:hasForm [
+            htv:methodName "GET" ;
+            hctl:hasTarget <coap://orgmanager:5686/agents> ;
+            hctl:hasOperationType td:invokeAction
+        ], [
+            htv:methodName "GET" ;
+            hctl:hasTarget <http://orgmanager:5686/agents> ;
             hctl:hasOperationType td:invokeAction
         ]
     ];

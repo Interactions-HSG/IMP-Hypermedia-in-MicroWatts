@@ -1,9 +1,9 @@
 package ch.unisg.orgmanager;
 
 import ch.unisg.orgmanager.config.CoapServerConfig;
+import ch.unisg.orgmanager.config.YggdrasilConfig;
 import ch.unisg.orgmanager.controller.coap.AgentResource;
 import ch.unisg.orgmanager.controller.coap.GroupsResource;
-import ch.unisg.orgmanager.controller.coap.RoleResource;
 import ch.unisg.orgmanager.controller.coap.RolesResource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,10 +26,9 @@ public class OrgManagerApplication {
 
 		server.start();
 
-		/*
 		System.out.println("Setting up Yggdrasil");
 		YggdrasilConfig yggdrasil = new YggdrasilConfig();
-		 */
+
 	}
 
 }

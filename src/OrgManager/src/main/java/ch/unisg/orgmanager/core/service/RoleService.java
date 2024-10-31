@@ -2,6 +2,7 @@ package ch.unisg.orgmanager.core.service;
 
 import ch.unisg.orgmanager.core.entity.Organization;
 import ch.unisg.orgmanager.core.port.in.RoleUseCase;
+import ch.unisg.orgmanager.core.port.in.command.RoleCommand;
 import lombok.RequiredArgsConstructor;
 import moise.oe.RolePlayer;
 import moise.xml.DOMUtils;
@@ -14,17 +15,17 @@ public class RoleService implements RoleUseCase {
     private Organization organization = Organization.getOrganization();
 
     @Override
-    public void adoptRole(String agentName, String roleName) {
+    public void adoptRole(RoleCommand command) {
 
         try {
 
-            System.out.println(organization.getOrgEntity().getAgents());
-
-            System.out.println(agentName + " " + roleName);
-
-            System.out.println(organization.getOrgEntity().getGroups());
-            System.out.println(organization.getOrgEntity().getGroups().toString());
-            RolePlayer rolePlayer = organization.getOrgEntity().getAgent(agentName).adoptRole(roleName, "group_room_automation");
+            organization
+                    .getOrgEntity()
+                    .getAgent(command.getAgentName())
+                    .adoptRole(
+                            command.getRoleName(),
+                            command.getGroupName()
+                    );
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,6 +35,15 @@ public class RoleService implements RoleUseCase {
 
     @Override
     public String getRoles() {
+
+        try {
+            organization.getOrgEntity().startScheme("measure_telemetry");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(organization.getOrgEntity().getSchemes().toString());
+        System.out.println(organization.getOrgEntity().findScheme("measure_telemetry"));
         String roles = organization.getOrgEntity().getOS().getSS().getRolesDef().toString();
         return roles;
     }

@@ -24,7 +24,7 @@
 
     <functional-specification>
         <scheme id="measure_telemetry">
-            <goal id="goal_measure_telemetry" type="achievement">
+            <goal id="goal_measure_telemetry">
                 <plan operator="parallel">
                     <goal id="goal_measure_room_temperature" min="1"></goal>
                     <goal id="goal_measure_room_humidity"></goal>

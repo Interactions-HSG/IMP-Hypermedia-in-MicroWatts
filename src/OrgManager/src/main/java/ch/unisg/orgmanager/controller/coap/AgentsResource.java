@@ -39,15 +39,22 @@ public class AgentsResource extends CoapResource {
 
     @Override
     public void handlePOST(CoapExchange exchange) {
+        /*
+            Add agent to agent list
+         */
 
+        // retrieve the request
         Request request = exchange.advanced().getRequest();
 
+        // add agent to the organization
         agentUseCase.addAgent(request.getPayloadString());
 
+        // create a new resource endpoint for the agent
         Resource roles = server.getRoot().getChild("agents");
         roles.add(new AgentResource(request.getPayloadString()));
+        Response response = new Response(CoAP.ResponseCode.CREATED);
 
-        Response response = new Response(CoAP.ResponseCode.CONTENT);
+        // send a response to the client
         response.setPayload("Agent is added.");
         exchange.respond(response);
     }

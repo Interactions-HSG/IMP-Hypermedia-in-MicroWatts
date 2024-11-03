@@ -1,11 +1,11 @@
 services:
-  organization_manager:
+  omi:
     build:
-      context: ./OrgManager
-    container_name: organization_manager
+      context: ./OMI
+    container_name: omi
     #    environment:
     ports:
-      - "7500:7500"
+      - "7500:7500/tcp"
       - "5686:5686/udp"
     restart: always
     networks:

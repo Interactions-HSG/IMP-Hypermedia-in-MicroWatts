@@ -40,9 +40,8 @@ public class RoleService implements RoleUseCase {
             e.printStackTrace();
         }
 
-        System.out.println(organization.getOrgEntity().getSchemes().toString());
-        System.out.println(organization.getOrgEntity().findScheme("measure_telemetry"));
         String roles = organization.getOrgEntity().getOS().getSS().getRolesDef().toString();
+
         return roles;
     }
 }

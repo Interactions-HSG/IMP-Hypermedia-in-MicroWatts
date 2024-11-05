@@ -15,7 +15,7 @@ public class SchemeService implements SchemeUseCase {
     public void startScheme(String schemeName) {
 
         try {
-            organization.getOrgEntity().startScheme(schemeName);
+            organization.getOrgEntity().startScheme(schemeName, "measure_telemetry");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -24,7 +24,7 @@ public class SchemeService implements SchemeUseCase {
     @Override
     public void addScheme() {
         try {
-            // TODO: Add scheme to the group represented by the group id
+            System.out.println("Scheme is added...");
         } catch (Exception e) {
             e.printStackTrace();
         }

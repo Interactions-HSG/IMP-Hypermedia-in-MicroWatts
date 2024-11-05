@@ -2,6 +2,7 @@ package ch.unisg.omi.controller.coap;
 
 import ch.unisg.omi.config.CoapServerConfig;
 import ch.unisg.omi.core.port.in.RoleUseCase;
+import ch.unisg.omi.core.port.in.command.RoleCommand;
 import ch.unisg.omi.core.service.RoleService;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
@@ -38,6 +39,9 @@ public class RolesResource extends CoapResource {
     public void handlePOST(CoapExchange exchange) {
 
         Request request = exchange.advanced().getRequest();
+
+        RoleCommand command = new RoleCommand("","","");
+        roleUseCase.adoptRole(command);
 
         Resource roles = server.getRoot().getChild("roles");
         roles.add(new RoleResource(request.getPayloadString()));

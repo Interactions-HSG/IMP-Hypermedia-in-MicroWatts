@@ -11,15 +11,12 @@ import org.springframework.stereotype.Service;
 public class GroupService implements GroupUseCase {
 
     private Organization organization = Organization.getOrganization();
-    private Broadcaster broadcaster = Broadcaster.getBroadcaster();
 
     @Override
     public void addGroup(String groupName) {
 
         try {
             organization.getOrgEntity().addGroup(groupName, "group_room_automation");
-            broadcaster.send();
-
         } catch (Exception e) {
             e.printStackTrace();
         }

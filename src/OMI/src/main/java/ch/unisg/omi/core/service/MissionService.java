@@ -4,7 +4,11 @@ import ch.unisg.omi.config.CoapServerConfig;
 import ch.unisg.omi.core.entity.Organization;
 import ch.unisg.omi.core.port.in.MissionUseCase;
 import ch.unisg.omi.core.port.in.command.MissionCommand;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
+@Service("mission")
 public class MissionService implements MissionUseCase {
 
     private final CoapServerConfig server = CoapServerConfig.getInstance();

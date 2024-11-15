@@ -1,12 +1,12 @@
 services:
-  org:
+  omi:
     build:
-      context: ./OrgManager
-    container_name: org
+      context: ./OMI
+    container_name: omi
     environment:
       - ENTRYPOINT=http://yggdrasil:8080/
     ports:
-      - "8083:8083"
+      - "7500:7500/tcp"
       - "5686:5686/udp"
     restart: always
     networks:

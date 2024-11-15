@@ -1,6 +1,7 @@
 package ch.unisg.db;
 
 import ch.unisg.db.config.DBServer;
+import ch.unisg.db.config.Yggdrasil;
 import ch.unisg.db.controllers.TelemetryController;
 import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.TcpConfig;
@@ -27,7 +28,7 @@ public class DataLakeApplication {
 
         /** set up yggdrasil */
         System.out.println("Setting up yggdrasil...");
-        Launcher.main();
+        // Yggdrasil.main();
 
         /** Set up coap */
         System.out.println("Setting up Coap...");

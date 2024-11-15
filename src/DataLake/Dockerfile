@@ -1,13 +1,12 @@
-FROM maven as build
+FROM maven AS build
 
 COPY . /app
 
-RUN mvn -f app/pom.xml clean package -DskipTests
+RUN mvn -f app/pom.xml -X clean package -DskipTests
 
 FROM openjdk:21-jdk
 
 COPY --from=build /app/target/DataLake-0.0.1.jar ./DataLake-0.0.1.jar
-
 COPY --from=build /app/src/main/resources/application.properties ./application.properties
 COPY --from=build /app/src/main/resources/metadata.ttl ./metadata.ttl
 

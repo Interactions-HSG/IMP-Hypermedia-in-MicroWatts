@@ -1,42 +1,22 @@
-package ch.unisg.db;
-
-import ch.unisg.ics.interactions.wot.td.ThingDescription;
-import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
-import ch.unisg.ics.interactions.wot.td.affordances.Form;
-import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
-import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
-import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
-import ch.unisg.ics.interactions.wot.td.io.TDGraphWriter;
-import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
-import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
+package ch.unisg.db.config;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class Launcher {
+public class Yggdrasil {
 
     public static String ENTRYPOINT = "http://yggdrasil:8080/";
     public static String WORKSPACE = "root";
     public static String name = "datalake";
 
     public static void main() throws IOException {
-
         /**
-         * read the thing description of yggdrasil
-         * retrieve the action to create a workspace
-         * if the action exists, create a new workspace
-         */
 
         // read the thing description of yggdrasil
         ThingDescription tdYggdrasil = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT);
 
-        /**
-         * read the thing description of the workspace
-         * retrieve the action to create an artifact
-         * if the action exits, create a new artifact with thing description to interact with db
-         */
 
         // read the thing description of the workspace
         ThingDescription tdWorkspace =
@@ -45,8 +25,6 @@ public class Launcher {
 
         // retrieve the action to create a new artifact in order to interact with the service itself
         Optional<ActionAffordance> action = tdWorkspace.getActionByName("createArtifact");
-
-        /** Get temperatures */
 
 
         // if the action is valid, create a new artifact
@@ -77,5 +55,6 @@ public class Launcher {
         } else {
             System.out.println("No action found");
         }
+        */
     }
 }

@@ -53,3 +53,55 @@ But that would mean that the agent cannot take the actual uris advertised in the
 - Using the Agent body artifact to expose signifiers that point to the location of Data storage. There could be one central DB service that exposes a query endpoint and the agents would point to that endpoint, with each agent indicating in their representation what parameters must be used on the query endpoint to get the data they have stored.
 - Could have a program sitting in network that listens for new devices joining and sends them location of yggdrasil endpoint -> requires a set endpoint for the agents to receive the yggdrasil endpoint -> like .well-known
 - Could have a program that listens for new devices joining and sends them the location of the orgManager -> requires a set endpoint for the agents to receive the orgManager endpoint -> like .well-known -> would enable no hardcoding of even entrypoint
+
+
+embedded device:
+
+startup
+-> connect thread network
+
+( ble get entrypoint )
+( room hardcoded )
+
+-> /root/artifacts/
+
+-> /root/artifacts/orgManager
+-> /root/artifacts/datalake
+
+OrgManagerlogic:
+-> join org
+
+-> join group ( room )
+-> get roles
+-> evaluates roles
+-> adopt a role
+
+-> send measurements ( either immediately or upon group well-formed )
+
+-> quit roles
+
+
+Full logic - Constrained Sensing Agent:
+-> join workspace ( room )
+
+<- groupname groupid ( room )
+
+-> join group ( room )
+<- rollen ( room )
+-> adopt role ( room )
+<- success ( room )
+
+--- idle ---
+
+<- well-formed ( room )
+-> send measurements ( room )
+
+<- not well-formed ( room )
+-> stop sending measurements ( room )
+
+--- out of power ---
+-> quit workspaces ( room )
+
+
+
+++++ add to yggdrasil update messages of new / deleted devices the location header of the device

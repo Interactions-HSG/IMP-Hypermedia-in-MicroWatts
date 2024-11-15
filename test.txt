@@ -1,0 +1,69 @@
+embedded device:
+
+startup
+-> connect thread network
+
+( ble get entrypoint )
+( room hardcoded )
+
+-> /root/artifacts/
+
+-> /root/artifacts/orgManager
+-> /root/artifacts/datalake
+
+OrgManagerlogic:
+-> join org
+
+-> join group ( room )
+-> get roles
+-> evaluates roles
+-> adopt a role
+
+-> send measurements ( either immediately or upon group well-formed )
+
+-> quit roles
+
+
+Full logic - Constrained Sensing Agent:
+-> join workspace ( room )
+
+<- groupname groupid ( room )
+
+-> join group ( room )
+<- rollen ( room )
+-> adopt role ( room )
+<- success ( room )
+
+--- idle ---
+
+<- well-formed ( room )
+-> send measurements ( room )
+
+<- not well-formed ( room )
+-> stop sending measurements ( room )
+
+--- out of power ---
+-> quit workspaces ( room ) // if it leaves yggdrasil if out of power
+-> quit group // makes more sense since it is still in the workspace (room) even powered off
+
+
+
+++++ add to yggdrasil update messages of new / deleted devices the location header of the device
+
++++ trust scores for devices. e.g., faulty device that is part of org but never responds has low trust -> gb collection
+
+Building is an organisation
+
+workspaces in yggdrasil:
+    - abstraction to model environment
+    - physical space ( room )
+    - so all entities contained in the physical space would be in the workspace
+
+groups in organisations:
+    - abstract entity to enable coordination of agents within system
+    - groups do not have to be bound by physical location
+
+check rdf hdt first with cli tool to see if it is concise enough
+define mediatype for embedded devices that has stripped down tds ( signifier exposure mechanism )
+
+optimise with either restricting knowledge sent or binarized format of knowledge sent

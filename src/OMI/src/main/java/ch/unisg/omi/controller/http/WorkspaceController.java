@@ -1,5 +1,6 @@
 package ch.unisg.omi.controller.http;
 
+import ch.unisg.omi.config.YggdrasilConfig;
 import ch.unisg.omi.core.port.in.BroadcastUseCase;
 import ch.unisg.omi.core.port.in.GroupUseCase;
 import ch.unisg.omi.core.port.in.SchemeUseCase;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class WorkspaceController {
 
+    private final YggdrasilConfig yggdrasilConfig = YggdrasilConfig.getInstance();
     private final GroupUseCase groupUseCase;
     private final SchemeUseCase schemeUseCase;
     private final BroadcastUseCase broadcastUseCase;
@@ -23,6 +25,9 @@ public class WorkspaceController {
     public ResponseEntity<String> newWorkspace(@RequestBody String requestBody) {
 
         System.out.println("New workspace is created.");
+
+        // TODO: Retrieve the new workspace, subscribe to it.
+        yggdrasilConfig.subscribe("http://yggdrasil:8080/workspaces/room2", "http://omi:7500/workspaces/artifacts");
 
         // TODO: Change the group name to the location
         groupUseCase.addGroup("room1-group");
@@ -34,5 +39,6 @@ public class WorkspaceController {
         broadcastUseCase.broadcast("room1-group");
 
         return ResponseEntity.ok().body("OK");
+
     }
 }

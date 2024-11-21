@@ -25,9 +25,7 @@ public class OMIApplication {
 		server.start();
 
 		System.out.println("Setting up Yggdrasil...");
-		YggdrasilConfig yggdrasil = new YggdrasilConfig();
-		yggdrasil.subscribe();
-
+		YggdrasilConfig yggdrasil = YggdrasilConfig.getInstance();
+		yggdrasil.subscribe("http://yggdrasil:8080/workspaces/", "http://omi:7500/workspaces");
 	}
-
 }

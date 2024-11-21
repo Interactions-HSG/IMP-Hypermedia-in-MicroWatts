@@ -8,6 +8,7 @@ import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
 import com.google.gson.Gson;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,7 +26,10 @@ public class YggdrasilConfig {
     public static String WORKSPACE = "root";
     public static String NAME = "omi";
 
-    public YggdrasilConfig() {
+    /*
+     * Set up yggdrasil
+     */
+    private YggdrasilConfig() {
 
         try {
 
@@ -36,7 +40,7 @@ public class YggdrasilConfig {
             Optional<ActionAffordance> action = tdWorkspace.getActionByName("createArtifact");
 
             if (action.isPresent()) {
-                
+
                 TDHttpRequest requestArtifact = new TDHttpRequest(action.get().getFirstForm()
                         .orElseThrow(),
                         TD.invokeAction);
@@ -56,13 +60,15 @@ public class YggdrasilConfig {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-
     }
 
-    public void subscribe() {
+    @Getter
+    private static final YggdrasilConfig instance = new YggdrasilConfig();
 
-        String topic = ENTRYPOINT + "workspaces/";
-        String callback = "http://omi:7500/workspaces";
+    /*
+     * Subscribe to a topic
+     */
+    public void subscribe(String topic, String callback) {
 
         HashMap map = new HashMap<>();
         map.put("hub.topic", topic);

@@ -11,10 +11,24 @@
 +!start : true
     <- .print("hello world.");
        .date(Y,M,D); .time(H,Min,Sec,MilSec); // get current date & time
-       +started(Y,M,D,H,Min,Sec);             // add a new belief
-       !findHyperMediaEnvironment.                     // First thing Automation Agent will do is join Organisation
+       +started(Y,M,D,H,Min,Sec).           // add a new belief
+       // !findHyperMediaEnvironment.            // First thing Automation Agent will do is join Organisation
 
++group(GroupName)[source(OMI)] : true <- 
+    .print("Log: New group ", GroupName, " received from ", OMI, ".");
+    !joinGroup.
 
+-group(GroupName)[source(OMI)] : true <-
+    .print("Log: Leave group ", GroupName, " received from ", OMI, ".");
+    !leaveGroup.
+
++!joinGroup : true <-
+    .print("Group is joined.").
+
++!leaveGroup : true <-
+    .print("Agent leaves group.").
+
+/*
 // Currently hardcoded EntryURI will be used
 +!findHyperMediaEnvironment : entrypoint(URI) <- 
        .print("Finding organisation");
@@ -33,6 +47,7 @@
        .wait(X);
        !findHyperMediaEnvironment.
 
+*/
 
 // Plan for if we do not find the root uri 
 +!workspaceFound(FoundWorkspace, RootWorkspaceUri) : FoundWorkspace == false <-

@@ -6,8 +6,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import org.apache.xpath.operations.Bool;
-
 import cartago.Artifact;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
@@ -18,11 +16,10 @@ import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 import static org.eclipse.rdf4j.model.util.Values.iri;
 
 
-
 public class HttpClientArtifact extends Artifact{
 
     private static String ENTRYPOINT = "http://yggdrasil:8080/";
-
+        
     void init(){}
 
     public String readEndpoint(String urir) {

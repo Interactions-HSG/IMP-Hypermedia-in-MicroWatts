@@ -22,4 +22,6 @@ mas automationagent {
     workspace w {
       artifact c1: HttpClientArtifact() 
     }
+
+    platform: jacamo.rest.JCMRest("--restPort 9000")
 }

@@ -1,5 +1,3 @@
-// Agent sample_agent in project automationagent
-
 /* Initial beliefs and rules */
 
 /* Initial goals */
@@ -8,25 +6,74 @@
 
 /* Plans */
 
-+!start : true
-    <- .print("hello world.");
-       .date(Y,M,D); .time(H,Min,Sec,MilSec); // get current date & time
-       +started(Y,M,D,H,Min,Sec).           // add a new belief
-       // !findHyperMediaEnvironment.            // First thing Automation Agent will do is join Organisation
++!start : true <- 
+    .print("hello world.");
+    .date(Y,M,D); .time(H,Min,Sec,MilSec); // get current date & time
+    +started(Y,M,D,H,Min,Sec).           // add a new belief
+    // !findHyperMediaEnvironment. // First thing Automation Agent will do is join Organisation
 
+/* Receiving belief from a user to determine the temperature of a room
+1. Find the workspace Room
+2. Enter the workspace Room
+ *
+ */
++get_temperature(Room)[source(User)] : true <-
+    .print("Log: Measure the temperature in ", Room, ".");
+    !joinWorkspace(Room).
+
+/* Receiving belief from a user to stop determining the temperature of a room.
+ *
+ */
+-get_temperature(Room)[source(User)] : true <-
+    .print("Log: Stop the temperature measurement in ", Room, ".");
+    !leaveWorkspace(Room).
+
+/* Receiving belief from the OMI to join a group
+ * 
+ */
 +group(GroupName)[source(OMI)] : true <- 
     .print("Log: New group ", GroupName, " received from ", OMI, ".");
     !joinGroup.
 
+/* Receiving belief from the OMI to exit a group
+ *
+ */
 -group(GroupName)[source(OMI)] : true <-
     .print("Log: Leave group ", GroupName, " received from ", OMI, ".");
     !leaveGroup.
 
-+!joinGroup : true <-
+/* Plan for joining workspace
+ *
+ */
++!joinWorkspace(Room) : true <-
+    .print("Join workspace ", Room,".");
+    joinYggdrasil(Room, Success).
+
+/* Plan for leaving a workspace
+ *
+ */
++!leaveWorkspace(Room) : true <-
+    .print("Leave workspace ", Room, ".").
+
+
+/* Plan for joining a group after joining a workspace
+ *
+ */
++!joinGroup : group(GroupName) <-
     .print("Group is joined.").
 
-+!leaveGroup : true <-
+/* Plan for leaving a group after exiting a workspace. 
+ *
+ */
++!leaveGroup : group(GroupName) <-
     .print("Agent leaves group.").
+
+/*
+1. If the group is well formed, perform the action. 
+ *
+ */
++!performAction : task(TaskId) <-
+    .print("Agent performs task.").
 
 /*
 // Currently hardcoded EntryURI will be used
@@ -75,8 +122,6 @@
        .print("Found Organisation Artifact, trying to join Organisation.");
        readEndpoint(OrgArtifactUri, OrgRepresentation);
        joinOrganisation(OrgRepresentation,Success).
-
-
 
 { include("$jacamo/templates/common-cartago.asl") }
 { include("$jacamo/templates/common-moise.asl") }

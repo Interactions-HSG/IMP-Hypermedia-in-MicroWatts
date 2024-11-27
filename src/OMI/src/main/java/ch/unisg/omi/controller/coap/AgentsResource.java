@@ -2,6 +2,8 @@ package ch.unisg.omi.controller.coap;
 
 import ch.unisg.omi.config.CoapServerConfig;
 import ch.unisg.omi.core.port.in.AgentUseCase;
+import ch.unisg.omi.core.port.in.MissionUseCase;
+import ch.unisg.omi.core.port.out.AgentPort;
 import ch.unisg.omi.core.service.AgentService;
 import moise.oe.OEAgent;
 import org.eclipse.californium.core.CoapResource;
@@ -10,17 +12,23 @@ import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class AgentsResource extends CoapResource {
 
     private final AgentUseCase agentUseCase;
+    private final MissionUseCase missionUseCase;
     private final CoapServerConfig server;
 
-    public AgentsResource(String name) {
-        super(name);
-        this.agentUseCase = new AgentService();
+    @Autowired
+    public AgentsResource(AgentUseCase agentUseCase, MissionUseCase missionUseCase) {
+        super("agents");
+        this.agentUseCase = agentUseCase;
+        this.missionUseCase = missionUseCase;
         this.server = CoapServerConfig.getInstance();
     }
 
@@ -51,7 +59,7 @@ public class AgentsResource extends CoapResource {
 
         // create a new resource endpoint for the agent
         Resource roles = server.getRoot().getChild("agents");
-        roles.add(new AgentResource(request.getPayloadString()));
+        roles.add(new AgentResource(request.getPayloadString(), agentUseCase, missionUseCase));
         Response response = new Response(CoAP.ResponseCode.CREATED);
 
         // send a response to the client

@@ -7,25 +7,29 @@ import ch.unisg.omi.core.port.in.command.MissionCommand;
 import ch.unisg.omi.core.service.AgentService;
 import ch.unisg.omi.core.service.MissionService;
 import com.google.gson.Gson;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 public class AgentResource extends CoapResource {
 
     private final AgentUseCase agentUseCase;
     private final MissionUseCase missionUseCase;
 
-    public AgentResource(String name) {
+    public AgentResource(String name, AgentUseCase agentUseCase, MissionUseCase missionUseCase) {
         super(name);
-        this.agentUseCase = new AgentService();
-        this.missionUseCase = new MissionService();
+        this.agentUseCase = agentUseCase;
+        this.missionUseCase = missionUseCase;
     }
 
     @Override
     public void handleGET(CoapExchange exchange) {
-
+        agentUseCase.getAgents();
     }
 
     @Override

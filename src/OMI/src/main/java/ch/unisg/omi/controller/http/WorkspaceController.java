@@ -7,10 +7,7 @@ import ch.unisg.omi.core.port.in.SchemeUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,21 +19,22 @@ public class WorkspaceController {
     private final BroadcastUseCase broadcastUseCase;
 
     @PostMapping(path = "/workspaces")
-    public ResponseEntity<String> newWorkspace(@RequestBody String requestBody) {
+    public ResponseEntity<String> newWorkspace(
+            @RequestHeader("Location") String location,
+            @RequestBody String requestBody
+    ) {
 
         System.out.println("New workspace is created.");
 
-        // TODO: Retrieve the new workspace, subscribe to it.
-        yggdrasilConfig.subscribe("http://yggdrasil:8080/workspaces/room2", "http://omi:7500/workspaces/artifacts");
+        yggdrasilConfig.subscribe(location, "http://omi:7500/workspaces/artifacts");
 
-        // TODO: Change the group name to the location
-        groupUseCase.addGroup("room1-group");
+        String workspaceName = location.split("/")[location.split("/").length - 1];
 
-        // TODO: Make the scheme dynamic
-        schemeUseCase.startScheme("room1-scheme");
+        groupUseCase.addGroup(workspaceName + "-group");
 
-        // TODO: Broadcast dynamically
-        broadcastUseCase.broadcast("room1-group");
+        schemeUseCase.startScheme(workspaceName + "-scheme");
+
+        broadcastUseCase.broadcast(workspaceName + "-group");
 
         return ResponseEntity.ok().body("OK");
 

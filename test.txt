@@ -25,12 +25,13 @@ OrgManagerlogic:
 
 
 Full logic - Constrained Sensing Agent:
--> join workspace ( room )
+-> join workspace yggdrasil ( room1 ) // OMI gets notification new agent + adds agent to Org
 
 <- groupname groupid ( room )
 
 -> join group ( room )
 <- rollen ( room )
+
 -> adopt role ( room )
 <- success ( room )
 
@@ -43,7 +44,7 @@ Full logic - Constrained Sensing Agent:
 -> stop sending measurements ( room )
 
 --- out of power ---
--> quit workspaces ( room ) // if it leaves yggdrasil if out of power
+-> quit workspaces ( room ) // if it leaves yggdrasil if out of power + OMI removes agent
 -> quit group // makes more sense since it is still in the workspace (room) even powered off
 
 

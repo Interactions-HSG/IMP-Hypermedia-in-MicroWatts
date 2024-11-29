@@ -23,5 +23,5 @@ mas automationagent {
       artifact c1: HttpClientArtifact() 
     }
 
-    platform: jacamo.rest.JCMRest("--restPort 9000")
+    platform: jacamo.rest.JCMRest("--restPort 8081")
 }

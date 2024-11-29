@@ -1,13 +1,18 @@
-FROM eclipse-temurin:21-jdk
+# Official Gradle image 
+FROM gradle AS builder
 
-WORKDIR /app/
-
-COPY /src/automationagent .
-
-RUN ./gradlew clean build --no-daemon
-
-EXPOSE 8081
-
+# Set the working directory inside the container
 WORKDIR /app
 
-CMD ["./gradlew"]
+# Copy application source code
+COPY src/automationagent /app
+
+# Download dependencies
+RUN ./gradlew clean build --no-daemon
+
+# Expose the application's port
+EXPOSE 8081
+
+# Run the application
+ENTRYPOINT ["./gradlew", "run"]
+

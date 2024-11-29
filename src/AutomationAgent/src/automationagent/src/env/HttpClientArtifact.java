@@ -1,25 +1,27 @@
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.rdf4j.model.Value;
-
-import com.github.jsonldjava.utils.Obj;
 
 import cartago.Artifact;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
 import ch.unisg.ics.interactions.wot.td.ThingDescription;
 import ch.unisg.ics.interactions.wot.td.ThingDescription.TDFormat;
+import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
+import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
+import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
-import jason.stdlib.foreach;
+import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
+import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
 
 import static org.eclipse.rdf4j.model.util.Values.iri;
 
@@ -58,6 +60,46 @@ public class HttpClientArtifact extends Artifact{
         }
     }
     
+    /*
+     * 
+     */
+    public void createArtifact(String workspace) {
+
+        workspace = "http://127.0.0.1:8080/workspaces/room1#workspace"; // in docker env, i can delete it. 
+        
+        try {
+        
+            ThingDescription td = TDGraphReader.readFromURL(TDFormat.RDF_TURTLE, workspace);
+
+            Optional<ActionAffordance> action = td.getActionByName("createArtifact");
+
+            if (action.isPresent()) {
+
+                TDHttpRequest request = new TDHttpRequest(action.get().getFirstForm().orElseThrow(), TD.invokeAction);
+
+                request.addHeader("Slug", "AutomationAgent");
+                request.addHeader("X-Agent-WebID", "http://aa:9000/");
+                
+                final var metadata = Files.readString(Path.of("resources/metadata.ttl"));
+    
+                StringSchema schema = new StringSchema.Builder().build();
+     
+                request.setPrimitivePayload(schema, metadata);
+
+                System.out.println(request);
+                TDHttpResponse response = request.execute();
+
+                System.out.println("Status code: " + response.getStatusCode());
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("ERROR!");
+            // TODO: handle exception
+        }
+        
+    }
+
     /* Join a specific workspace
      * Operation receives a workspace name
      */
@@ -75,6 +117,9 @@ public class HttpClientArtifact extends Artifact{
                 // If a workspace contains the room within the uri ...
                 if (workspace.toString().contains(workspaceName.replace("'", ""))) {
                     
+                    System.out.println("TESTOPEN");
+                    createArtifact(workspace.stringValue());
+
                     // Get Formular to join the workspace, and do it!
                     // Join the workspace
                     System.out.println(workspace);

@@ -46,7 +46,7 @@ public class YggdrasilConfig {
                         TD.invokeAction);
                 requestArtifact.addHeader("Slug", NAME);
                 requestArtifact.addHeader("X-Agent-WebID", "http://omi:7500/");
-
+                
                 final var metadata = Files.readString(Path.of("metadata.ttl"));
 
                 StringSchema schema = new StringSchema.Builder().build();

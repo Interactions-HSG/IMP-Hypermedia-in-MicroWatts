@@ -28,7 +28,7 @@ import static org.eclipse.rdf4j.model.util.Values.iri;
 
 public class HttpClientArtifact extends Artifact{
 
-    private static String ENTRYPOINT = "http://127.0.0.1:8080/";
+    private static String ENTRYPOINT = "http://yggdrasil:8080/";
         
     void init(){}
 
@@ -64,11 +64,9 @@ public class HttpClientArtifact extends Artifact{
      * 
      */
     public void createArtifact(String workspace) {
-
-        workspace = "http://127.0.0.1:8080/workspaces/room1#workspace"; // in docker env, i can delete it. 
         
         try {
-        
+            
             ThingDescription td = TDGraphReader.readFromURL(TDFormat.RDF_TURTLE, workspace);
 
             Optional<ActionAffordance> action = td.getActionByName("createArtifact");
@@ -78,7 +76,7 @@ public class HttpClientArtifact extends Artifact{
                 TDHttpRequest request = new TDHttpRequest(action.get().getFirstForm().orElseThrow(), TD.invokeAction);
 
                 request.addHeader("Slug", "AutomationAgent");
-                request.addHeader("X-Agent-WebID", "http://aa:9000/");
+                request.addHeader("X-Agent-WebID", "http://automation_agent:8081/");
                 
                 final var metadata = Files.readString(Path.of("resources/metadata.ttl"));
     
@@ -117,7 +115,6 @@ public class HttpClientArtifact extends Artifact{
                 // If a workspace contains the room within the uri ...
                 if (workspace.toString().contains(workspaceName.replace("'", ""))) {
                     
-                    System.out.println("TESTOPEN");
                     createArtifact(workspace.stringValue());
 
                     // Get Formular to join the workspace, and do it!
@@ -133,6 +130,18 @@ public class HttpClientArtifact extends Artifact{
         }
     }
 
+    /*
+     * 
+     */
+    @OPERATION
+    public void joinGroup(String resourceUri, OpFeedbackParam<Boolean> success) {
+        
+        // Find omi
+        // Invoke action to join a group
+
+    
+        success.set(true);
+    }
     /* 
      * 
      */

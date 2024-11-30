@@ -24,16 +24,22 @@ public class WorkspaceController {
             @RequestBody String requestBody
     ) {
 
-        System.out.println("New workspace is created.");
+        // Log message
+        System.out.println("Log: New workspace " + location + " is created.");
 
+        // Subscribe to the workspace to listen for new artifacts.
         yggdrasilConfig.subscribe(location, "http://omi:7500/workspaces/artifacts");
 
+        // Get the workspace name of the uri
         String workspaceName = location.split("/")[location.split("/").length - 1];
 
+        // Add a new organization group for the workspace
         groupUseCase.addGroup(workspaceName + "-group");
 
+        // Start a new organization scheme
         schemeUseCase.startScheme(workspaceName + "-scheme");
 
+        // Start broadcasting to agents within the group
         broadcastUseCase.broadcast(workspaceName + "-group");
 
         return ResponseEntity.ok().body("OK");

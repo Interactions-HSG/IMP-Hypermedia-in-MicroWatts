@@ -26,10 +26,12 @@ public class AgentService implements AgentUseCase {
             String agentName = agentId;
 
             // TODO: Add agent to the agent list of the organization
-            String workspaceName = "room5"; // Retrieve the workspace name from the location header
+            String workspaceName = "room11"; // Retrieve the workspace name from the location header
 
             organization.getOrgEntity().addAgent(agentName);
+
             agentPort.sendGroupName(workspaceName + "-group");
+
         } catch (Exception e) {
             e.printStackTrace();
         }

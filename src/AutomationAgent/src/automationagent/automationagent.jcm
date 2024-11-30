@@ -19,6 +19,11 @@ mas automationagent {
       beliefs: entrypoint("http://yggdrasil:8080/")
     }
 
+    agent jane: automation_agent.asl {
+      focus: w.c1
+      beliefs: entrypoint("http://yggdrasil:8080/")
+    }
+
     workspace w {
       artifact c1: HttpClientArtifact() 
     }

@@ -16,9 +16,26 @@
         ], [
             htv:methodName "POST" ;
             hctl:hasTarget <http://omi:7500/roles> ;
-            hctl:forContentType "text/plain" ;
+            hctl:forContentType "application/json" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "http"
+        ]
+    ], [
+        td:name "joinGroup" ;
+        td:hasForm [
+            htv:methodName "POST" ;
+            hctl:hasTarget <http://omi:7500/groups> ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "http"
+        ] ;
+        td:hasInputSchema [ a js:ObjectSchema;
+            js:properties [
+                a js:StringSchema;
+                js:propertyName "agentId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "groupName"
+            ]
         ]
     ], [
         td:name "getRoles" ;

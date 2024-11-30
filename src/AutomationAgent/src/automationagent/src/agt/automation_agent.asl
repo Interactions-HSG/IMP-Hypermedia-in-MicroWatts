@@ -60,6 +60,7 @@
  *
  */
 +!joinGroup : group(GroupName) <-
+    joinGroup(GroupName);
     .print("Group is joined.").
 
 /* Plan for leaving a group after exiting a workspace. 

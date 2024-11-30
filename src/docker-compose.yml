@@ -9,20 +9,21 @@ services:
       - "7500:7500/tcp"
       - "5686:5686/udp"
     restart: always
+    depends_on:
+      - yggdrasil
     networks:
       - smart-buidling
 
-  datalake:
-    container_name: datalake
-    build:
-      context: ./DataLake
-    ports:
-      - "7600:7600"
-      - "5685:5685/udp"
-    networks:
-      - smart-buidling
-
-
+      #  datalake:
+      #    container_name: datalake
+      #    build:
+      #      context: ./DataLake
+      #    ports:
+      #      - "7600:7600"
+      #      - "5685:5685/udp"
+      #    networks:
+      #      - smart-buidling
+      #
   yggdrasil:
     build:
       context: ./Yggdrasil
@@ -37,10 +38,10 @@ services:
       - smart-buidling
     restart: always
 
-  automation_agent:
+  aa:
     build:
       context: ./AutomationAgent
-    container_name: automation_agent
+    container_name: aa
     environment:
       - AUTOMATION_AGENT_VERSION=0.0.0
       - YGGDRASIL_URL=http://yggdrasil:8080
@@ -48,32 +49,35 @@ services:
       - "8081:8081"
     networks:
       - smart-buidling
+    depends_on:
+      - yggdrasil
+      - omi
     restart: on-failure
 
-  sensing_agent:
-    build:
-      context: ./SensingAgent
-    container_name: sensing_agent
-    environment:
-      - ENTRYPOINT=coap://yggdrasil:5683/
-      - MY_ROOM=room1
-    ports:
-      - "8082:8082"
-      - "5684:5684/udp"
-    networks:
-        - smart-buidling
-    restart: on-failure
-
-  frontend:
-    build:
-      context: ./frontend
-    container_name: frontend
-    hostname: frontend
-    ports:
-      - "4000:4000"
-    networks:
-      - smart-buidling
-
+    #  sensing_agent:
+    #    build:
+    #      context: ./SensingAgent
+    #    container_name: sensing_agent
+    #    environment:
+    #      - ENTRYPOINT=coap://yggdrasil:5683/
+    #      - MY_ROOM=room1
+    #    ports:
+    #      - "8082:8082"
+    #      - "5684:5684/udp"
+    #    networks:
+    #        - smart-buidling
+    #    restart: on-failure
+    #
+    #  frontend:
+    #    build:
+    #      context: ./frontend
+    #    container_name: frontend
+    #    hostname: frontend
+    #    ports:
+    #      - "4000:4000"
+    #    networks:
+    #      - smart-buidling
+    #
 networks:
     smart-buidling:
         driver: bridge

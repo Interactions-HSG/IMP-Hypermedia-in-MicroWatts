@@ -1,4 +1,7 @@
 /* Initial beliefs and rules */
+role(automation_agent).
+
+hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 
 /* Initial goals */
 
@@ -19,7 +22,8 @@
  */
 +get_temperature(Room)[source(User)] : true <-
     .print("Log: Measure the temperature in ", Room, ".");
-    !joinWorkspace(Room).
+    !joinWorkspace(Room);
+    !adoptRole.
 
 /* Receiving belief from a user to stop determining the temperature of a room.
  *
@@ -32,15 +36,27 @@
  * 
  */
 +group(GroupName)[source(OMI)] : true <- 
-    .print("Log: New group ", GroupName, " received from ", OMI, ".");
-    !joinGroup.
+    .print("Log: New group ", GroupName, " received from ", OMI, ".").
+    
 
 /* Receiving belief from the OMI to exit a group
  *
  */
 -group(GroupName)[source(OMI)] : true <-
     .print("Log: Leave group ", GroupName, " received from ", OMI, ".");
-    !leaveGroup.
+    !leaveOmiGroup(GroupName).
+
+/*
+ *
+ */
++roles(RoleId)[source(Sender)] : true <-
+    .print("Log: New role ", RoleId, " received from ", Sender, ".").
+
+/*
+ *
+ */
+-roles(RoleId)[source(Sender)] : true <-
+    .print("Log: Leave role ", RoleId, " received from ", Sender, ".").
 
 /* Plan for joining workspace
  *
@@ -55,27 +71,14 @@
 +!leaveWorkspace(Room) : true <-
     .print("Leave workspace ", Room, ".").
 
++!adoptRole : hasRole(Role) & group(GroupId) <-
+    adoptRole(Role, GroupId, Success);
+    .print("RoleId: ", Role, " Group: ", GroupId, " Success: ", Success).
 
-/* Plan for joining a group after joining a workspace
- *
- */
-+!joinGroup : group(GroupName) <-
-    joinGroup(GroupName);
-    .print("Group is joined.").
-
-/* Plan for leaving a group after exiting a workspace. 
- *
- */
-+!leaveGroup : group(GroupName) <-
-    .print("Agent leaves group.").
-
-/*
-1. If the group is well formed, perform the action. 
- *
- */
-+!performAction : task(TaskId) <-
-    .print("Agent performs task.").
-
++!adoptRole : true <-
+    .print("Does not know RoleId and GroupId");
+    .wait(5000);
+    !adoptRole.
 /*
 // Currently hardcoded EntryURI will be used
 +!findHyperMediaEnvironment : entrypoint(URI) <- 

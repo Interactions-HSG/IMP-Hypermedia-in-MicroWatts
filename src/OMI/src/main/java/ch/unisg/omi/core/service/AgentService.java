@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service("Agent")
@@ -22,15 +24,8 @@ public class AgentService implements AgentUseCase {
     public void addAgent(String agentId) {
         try {
 
-            // TODO: retrieve the agentName from the agentId
-            String agentName = agentId;
-
-            // TODO: Add agent to the agent list of the organization
-            String workspaceName = "room11"; // Retrieve the workspace name from the location header
-
-            organization.getOrgEntity().addAgent(agentName);
-
-            agentPort.sendGroupName(workspaceName + "-group");
+            // add agent to the organization
+            organization.getOrgEntity().addAgent(agentId);
 
         } catch (Exception e) {
             e.printStackTrace();

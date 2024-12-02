@@ -16,6 +16,7 @@ public class MissionController {
     @PostMapping(path = "/missions")
     public ResponseEntity<String> commitToMission() {
 
+        // TODO: Commit to mission
         MissionCommand command = new MissionCommand("", "", "");
         missionUseCase.commitMission(command);
 

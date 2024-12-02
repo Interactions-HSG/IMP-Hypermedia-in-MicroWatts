@@ -21,8 +21,6 @@ public class BroadcastService implements BroadcastUseCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Async

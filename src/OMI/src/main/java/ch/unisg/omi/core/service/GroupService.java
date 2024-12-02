@@ -16,7 +16,7 @@ public class GroupService implements GroupUseCase {
     public void addGroup(String groupName) {
 
         try {
-            organization.getOrgEntity().addGroup(groupName, "group_room_automation");
+            organization.getOrgEntity().addGroup(groupName, "monitoring_team");
         } catch (Exception e) {
             e.printStackTrace();
         }

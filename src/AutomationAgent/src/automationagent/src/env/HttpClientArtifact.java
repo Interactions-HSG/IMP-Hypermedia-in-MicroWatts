@@ -29,6 +29,7 @@ import static org.eclipse.rdf4j.model.util.Values.iri;
 public class HttpClientArtifact extends Artifact{
 
     private static String ENTRYPOINT = "http://yggdrasil:8080/";
+    private static String WEBID = "http://yggdrasil:8080/workspaces/room1/artifacts/AutomationAgent";
         
     void init(){}
 
@@ -76,7 +77,7 @@ public class HttpClientArtifact extends Artifact{
                 TDHttpRequest request = new TDHttpRequest(action.get().getFirstForm().orElseThrow(), TD.invokeAction);
 
                 request.addHeader("Slug", "AutomationAgent");
-                request.addHeader("X-Agent-WebID", "http://automation_agent:8081/");
+                request.addHeader("X-Agent-WebID", WEBID);
                 
                 final var metadata = Files.readString(Path.of("resources/metadata.ttl"));
     
@@ -134,12 +135,9 @@ public class HttpClientArtifact extends Artifact{
      * 
      */
     @OPERATION
-    public void joinGroup(String resourceUri, OpFeedbackParam<Boolean> success) {
+    public void adoptRole(String roleId, String groupId, OpFeedbackParam<Boolean> success) {
         
-        // Find omi
-        // Invoke action to join a group
-        
-
+       // TODO: 
     
         success.set(true);
     }

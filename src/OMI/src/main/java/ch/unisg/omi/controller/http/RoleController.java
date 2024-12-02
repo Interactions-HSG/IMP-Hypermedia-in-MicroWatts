@@ -19,7 +19,11 @@ public class RoleController {
     @PostMapping(path = "/roles")
     public ResponseEntity<String> addRole(@RequestBody String test) {
 
-        RoleCommand command = new RoleCommand("","","");
+        // TODO: URI hardcoded from agent
+        RoleCommand command = new RoleCommand(
+                "http://yggdrasil:8080/workspaces/room1/artifacts/AutomationAgent",
+                "automation_agent",
+                "room1");
 
         roleUseCase.adoptRole(command);
 

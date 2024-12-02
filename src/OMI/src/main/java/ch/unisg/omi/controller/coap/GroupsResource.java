@@ -19,6 +19,9 @@ public class GroupsResource extends CoapResource {
 
     @Override
     public void handleGET(CoapExchange exchange) {
+        /*
+         * Get all group ids
+         */
         Request request = exchange.advanced().getRequest();
 
         Response response = new Response(CoAP.ResponseCode.CONTENT);
@@ -32,6 +35,10 @@ public class GroupsResource extends CoapResource {
 
     @Override
     public void handlePOST(CoapExchange exchange) {
+        /*
+         * Join group
+         */
+
         Request request = exchange.advanced().getRequest();
 
         groupUseCase.addGroup(request.getPayloadString());

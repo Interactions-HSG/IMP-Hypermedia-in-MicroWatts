@@ -9,7 +9,7 @@
         td:name "adoptRole";
         td:hasForm [
             htv:methodName "POST" ;
-            hctl:hasTarget <coap://omi:5686/roles> ;
+            hctl:hasTarget <coap://omi:5686/groupId> ;
             hctl:forContentType "text/plain" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "coap"
@@ -19,6 +19,18 @@
             hctl:forContentType "application/json" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "http"
+        ]
+        td:hasInputSchema [ a js:ObjectSchema;
+            js:properties [
+                a js:StringSchema;
+                js:propertyName "agentId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "groupName"
+            ], [
+                a js:StringSchema;
+                js:propertyName "roleId"
+            ]
         ]
     ], [
         td:name "joinGroup" ;
@@ -41,12 +53,12 @@
         td:name "getRoles" ;
         td:hasForm [
             htv:methodName "GET" ;
-            hctl:hasTarget <coap://omi:5686/roles> ;
+            hctl:hasTarget <coap://omi:5686/:groupId/roles> ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "coap"
         ], [
             htv:methodName "GET" ;
-            hctl:hasTarget <http://omi:5686/roles> ;
+            hctl:hasTarget <http://omi:5686/:groupId/roles> ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "http"
         ]

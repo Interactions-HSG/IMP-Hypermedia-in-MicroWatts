@@ -16,11 +16,15 @@ public class ArtifactController {
     private final AgentUseCase agentUseCase;
 
     @PostMapping(path = "/workspaces/artifacts")
-    public ResponseEntity<String> newArtifact() {
+    public ResponseEntity<String> newArtifact(
+            @RequestHeader("Location") String location
+    ) {
 
         System.out.println("New artifact is created.");
+        System.out.println(location);
 
-        // TODO: Retrieve the agent id from the location header
+        // TODO: Retrieve the agent id from the location heade
+        // TODO: yggdrasil
         String agentId = "http://aa:8081/agents/bob/inbox";
 
         agentUseCase.addAgent(agentId);

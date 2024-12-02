@@ -30,9 +30,6 @@
     "workspaces" : [
       {
         "name" : "root"
-      },
-      {
-        "name" : "room1"
       }
     ]
   }

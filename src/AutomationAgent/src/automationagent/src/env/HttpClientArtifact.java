@@ -138,6 +138,7 @@ public class HttpClientArtifact extends Artifact{
         
         // Find omi
         // Invoke action to join a group
+        
 
     
         success.set(true);

@@ -20,8 +20,6 @@ public class GroupController {
 
         RoleCommand command = new RoleCommand("", "", "");
 
-
-
         return new ResponseEntity<>("Ok", HttpStatus.OK);
     }
     // TODO: When an agent joins the group, send all available roles.

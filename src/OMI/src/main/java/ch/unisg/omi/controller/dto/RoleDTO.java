@@ -7,11 +7,11 @@ public class RoleDTO {
     public static final String MEDIA_TYPE = "application/role+json";
 
     @Getter
-    private String agentName;
+    private String agentId;
 
     @Getter
-    private String roleName;
+    private String groupId;
 
     @Getter
-    private String groupName;
+    private String roleId;
 }

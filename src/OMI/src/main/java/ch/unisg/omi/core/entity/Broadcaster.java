@@ -2,10 +2,15 @@ package ch.unisg.omi.core.entity;
 
 import ch.unisg.omi.core.port.out.AgentPort;
 import lombok.RequiredArgsConstructor;
+import moise.common.MoiseCardinalityException;
+import moise.common.MoiseConsistencyException;
 import moise.common.MoiseException;
+import moise.oe.PlanInstance;
+import moise.oe.SchemeInstance;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -29,6 +34,7 @@ public class Broadcaster {
 
             Object[] roles = organization.getOrgEntity().findGroup(groupName).getGrSpec().getRoles().getAll().toArray();
 
+            // Send all agents the available group names and roles
             organization.getOrgEntity().getAgents().forEach(agent -> {
                 agentPort.sendGroupName(agent.toString(), groupName);
                 agentPort.sendRoles(agent.toString(), roles);
@@ -42,26 +48,38 @@ public class Broadcaster {
             }
         }
 
-        System.out.println("Group " + groupName + " is well formed.");
+        // ?formationStatus == true
+        System.out.println("Log: Group " + groupName + " is well formed.");
 
+        /*
+         * Start new scheme
+         */
         try {
-            organization.getOrgEntity().startScheme("monitoring_scheme");
+
+            SchemeInstance schemeInstance = organization.getOrgEntity().startScheme("monitoring_scheme");
+            schemeInstance.addResponsibleGroup(groupName);
+            
+            organization.getOrgEntity().findGroup(groupName).getPlayers().forEach((player) -> {
+                System.out.println("Player: " + player.getPlayer());
+                System.out.println("Roles: " + player.getRole());
+
+
+                player.getPermissions().forEach(permission -> {
+                    permission.getMission().getGoals().forEach(goal -> {
+
+                        // TODO: Send achieve to agent with the goal -> Agent performs the plan and send the goal id back
+                        System.out.println("Goal: " + goal);
+                    });
+                });
+
+            });
+
         } catch (MoiseException eMoise) {
             eMoise.printStackTrace();
         }
 
 
-        // ?formationStatus == true
-
         // TODO: Next while loop to "achieve" plans for all missionplayer?
-
-        organization.getOrgEntity().findGroup("monitoring_team").getPlayers().forEach(player -> {
-            System.out.println("Role player: " + player);
-        });
-
-        organization.getOrgEntity().findScheme("monitoring_scheme").getPlayers().forEach(player -> {
-            System.out.println("Mission player: " + player);
-        });
 
         return CompletableFuture.completedFuture("group is well-formed.");
     }

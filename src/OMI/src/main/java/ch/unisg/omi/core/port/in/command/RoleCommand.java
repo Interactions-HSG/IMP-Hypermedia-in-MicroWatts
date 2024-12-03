@@ -7,21 +7,21 @@ import lombok.Value;
 public class RoleCommand {
 
     @NonNull
-    private final String agentName;
+    private final String agentId;
 
     @NonNull
-    private final String roleName;
+    private final String roleId;
 
     @NonNull
-    private final String groupName;
+    private final String groupId;
 
     public RoleCommand(
-            String agentName,
-            String roleName,
-            String groupName
+            String agentId,
+            String roleId,
+            String groupId
     ) {
-        this.agentName = agentName;
-        this.roleName = roleName;
-        this.groupName = groupName;
+        this.agentId = agentId;
+        this.roleId = roleId;
+        this.groupId = groupId;
     }
 }

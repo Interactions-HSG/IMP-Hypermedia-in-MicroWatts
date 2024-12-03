@@ -4,6 +4,7 @@ import ch.unisg.omi.core.entity.Organization;
 import ch.unisg.omi.core.port.in.RoleUseCase;
 import ch.unisg.omi.core.port.in.command.RoleCommand;
 import lombok.RequiredArgsConstructor;
+import moise.oe.RolePlayer;
 import moise.os.ss.Role;
 import org.springframework.stereotype.Component;
 
@@ -20,13 +21,15 @@ public class RoleService implements RoleUseCase {
 
         try {
 
-            organization
+            RolePlayer rolePlayer = organization
                     .getOrgEntity()
-                    .getAgent(command.getAgentName())
+                    .getAgent(command.getAgentId())
                     .adoptRole(
-                            command.getRoleName(),
-                            command.getGroupName()
+                            command.getRoleId(),
+                            command.getGroupId()
                     );
+
+            organization.getOrgEntity().findGroup(command.getGroupId()).addPlayer(rolePlayer);
 
         } catch (Exception e) {
             e.printStackTrace();

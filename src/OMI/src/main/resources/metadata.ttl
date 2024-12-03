@@ -16,18 +16,18 @@
             hctl:forSubProtocol "coap"
         ], [
             htv:methodName "POST" ;
-            hctl:hasTarget <http://omi:7500/room1> ;
+            hctl:hasTarget <http://omi:7500/roles> ;
             hctl:forContentType "application/json" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "http"
-        ]
+        ] ;
         td:hasInputSchema [ a js:ObjectSchema;
             js:properties [
                 a js:StringSchema;
                 js:propertyName "agentId"
             ], [
                 a js:StringSchema;
-                js:propertyName "groupName"
+                js:propertyName "groupId"
             ], [
                 a js:StringSchema;
                 js:propertyName "roleId"

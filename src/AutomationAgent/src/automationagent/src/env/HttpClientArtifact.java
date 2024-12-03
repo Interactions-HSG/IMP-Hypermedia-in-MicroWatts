@@ -6,6 +6,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,6 +22,8 @@ import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
+import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
+import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
 
@@ -28,9 +32,11 @@ import static org.eclipse.rdf4j.model.util.Values.iri;
 
 public class HttpClientArtifact extends Artifact{
 
+    private static String SLUG = "AutomationAgent";
     private static String ENTRYPOINT = "http://yggdrasil:8080/";
     private static String WEBID = "http://yggdrasil:8080/workspaces/room1/artifacts/AutomationAgent";
-        
+    private static String OMI = "http://yggdrasil:8080/workspaces/root/artifacts/omi";
+
     void init(){}
 
     /* Get a list of all workspaces
@@ -137,7 +143,45 @@ public class HttpClientArtifact extends Artifact{
     @OPERATION
     public void adoptRole(String roleId, String groupId, OpFeedbackParam<Boolean> success) {
         
+        try {
+            ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, OMI);
+
+            Optional<ActionAffordance> action = td.getActionByName("adoptRole");
+
+            if (action.isPresent()) {
+                TDHttpRequest request = new TDHttpRequest (
+                    action.get().getFirstFormForSubProtocol(TD.invokeAction, "http").orElseThrow(),
+                    TD.invokeAction
+                );
+
+                request.addHeader("Slug", SLUG);
+                request.addHeader("X-Agent-WebID", WEBID);
+
+                Optional<DataSchema> inputSchema = action.get().getInputSchema();
+
+                if (inputSchema.isPresent()) {
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("agentId", WEBID);
+                    payload.put("groupId", groupId);
+                    payload.put("roleId", roleId);
+
+                    request.setObjectPayload((ObjectSchema) inputSchema.get(), payload);
+                    TDHttpResponse response = request.execute();
+
+                    System.out.println("Status code: " + response.getStatusCode());
+                } else {
+                    System.out.println("Input schema not found.");
+                }
+
+            } else {
+                System.out.println("Action not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
        // TODO: 
+
+
     
         success.set(true);
     }

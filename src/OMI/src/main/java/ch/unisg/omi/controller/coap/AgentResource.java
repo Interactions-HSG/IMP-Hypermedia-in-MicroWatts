@@ -34,22 +34,6 @@ public class AgentResource extends CoapResource {
 
     @Override
     public void handlePOST(CoapExchange exchange) {
-        /*
-            Commit to a mission
-         */
-
-        Request request = exchange.advanced().getRequest();
-
-        Gson gson = new Gson();
-        MissionDTO missionDTO = gson.fromJson(request.getPayloadString(), MissionDTO.class);
-
-        MissionCommand command = new MissionCommand(
-                missionDTO.getAgentName(),
-                missionDTO.getMissionName(),
-                missionDTO.getSchemeName()
-        );
-
-        missionUseCase.commitMission(command);
 
         Response response = exchange.advanced().getResponse();
 

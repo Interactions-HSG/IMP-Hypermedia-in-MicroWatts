@@ -37,9 +37,6 @@ public class WorkspaceController {
         // Add a new organization group for the workspace
         groupUseCase.addGroup(workspaceName);
 
-        // Start a new organization scheme
-        // schemeUseCase.startScheme("measure_telemetry");
-
         // Start broadcasting to agents within the group
         broadcastUseCase.broadcast(workspaceName);
 

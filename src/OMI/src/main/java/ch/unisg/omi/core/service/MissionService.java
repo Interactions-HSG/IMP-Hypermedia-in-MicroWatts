@@ -13,22 +13,15 @@ import org.springframework.stereotype.Service;
 @Service("mission")
 public class MissionService implements MissionUseCase {
 
-    private final CoapServerConfig server = CoapServerConfig.getInstance();
     private final Organization organization = Organization.getOrganization();
 
     public void commitMission(MissionCommand command) {
 
-        // TODO: Commit To Mission
         try {
             organization
                     .getOrgEntity()
-                    .getAgent(command.getAgentName())
-                    .commitToMission(command.getMissionName(), command.getSchemeName());
-
-            organization.getOrgEntity().findScheme("");
-            MissionPlayer missionPlayer = organization.getOrgEntity().getAgent("").commitToMission("", "");
-
-            organization.getOrgEntity().findScheme("").getGoal("").getPlanToAchieve();
+                    .getAgent(command.getAgentId())
+                    .commitToMission(command.getMissionId(), command.getSchemeId());
         } catch (Exception e) {
             e.printStackTrace();
         }

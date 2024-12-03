@@ -30,9 +30,9 @@ public class MissionResource extends CoapResource {
         MissionDTO missionDTO = gson.fromJson(request.getPayloadString(), MissionDTO.class);
 
         MissionCommand command = new MissionCommand(
-                missionDTO.getAgentName(),
-                missionDTO.getMissionName(),
-                missionDTO.getSchemeName()
+                missionDTO.getAgentId(),
+                missionDTO.getMissionId(),
+                missionDTO.getSchemeId()
         );
 
         missionUseCase.commitMission(command);

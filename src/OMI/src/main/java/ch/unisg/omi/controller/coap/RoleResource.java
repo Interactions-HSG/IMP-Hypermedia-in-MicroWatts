@@ -42,7 +42,7 @@ public class RoleResource extends CoapResource {
         Gson gson = new Gson();
         RoleDTO roleDTO = gson.fromJson(request.getPayloadString(), RoleDTO.class);
 
-        RoleCommand command = new RoleCommand(roleDTO.getAgentName(), roleDTO.getRoleName(), roleDTO.getGroupName());
+        RoleCommand command = new RoleCommand(roleDTO.getAgentId(), roleDTO.getRoleId(), roleDTO.getGroupId());
 
         roleUseCase.adoptRole(command);
 

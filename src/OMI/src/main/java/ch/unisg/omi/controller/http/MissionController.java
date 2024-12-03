@@ -20,11 +20,11 @@ public class MissionController {
             @RequestBody MissionDTO missionDTO
             ) {
 
-        // TODO: Commit to mission
         MissionCommand command = new MissionCommand(
                 missionDTO.getAgentId(),
                 missionDTO.getMissionId(),
-                missionDTO.getSchemeId()
+                missionDTO.getSchemeId(),
+                missionDTO.getGoalId()
         );
 
         missionUseCase.commitMission(command);

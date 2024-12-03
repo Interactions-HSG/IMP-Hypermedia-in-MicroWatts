@@ -34,6 +34,37 @@
             ]
         ]
     ], [
+        a td:ActionAffordance;
+        td:name "commitToMission";
+        td:hasForm [
+            htv:methodName "POST" ;
+            hctl:hasTarget <coap://omi:5686/room1> ;
+            hctl:forContentType "text/plain" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "coap"
+        ], [
+            htv:methodName "POST" ;
+            hctl:hasTarget <http://omi:7500/missions> ;
+            hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "http"
+        ] ;
+        td:hasInputSchema [ a js:ObjectSchema;
+            js:properties [
+                a js:StringSchema;
+                js:propertyName "agentId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "missionId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "schemeId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "goalId"
+           ]
+        ]
+    ], [
         td:name "joinGroup" ;
         td:hasForm [
             htv:methodName "POST" ;

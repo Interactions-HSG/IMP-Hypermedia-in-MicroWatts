@@ -10,6 +10,8 @@ import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
 import ch.unisg.omi.core.port.out.AgentPort;
 import com.google.gson.Gson;
+import moise.oe.OEAgent;
+import moise.os.fs.Goal;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -118,5 +120,51 @@ public class AgentAdapter implements AgentPort {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void sendGoal(OEAgent agentId, Goal goal) {
+
+        try {
+            ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, agentId.toString());
+
+            Optional<ActionAffordance> action = td.getActionByName("advertiseMessage");
+
+            if (action.isPresent()) {
+                TDHttpRequest request = new TDHttpRequest(
+                        action.get().getFirstForm().orElseThrow(),
+                        TD.invokeAction
+                );
+
+                request.addHeader("Slug", "omi");
+                request.addHeader("X-Agent-WebID", "http://omi:7500/workspaces/root/artifacts/omi");
+
+                Optional<DataSchema> inputSchema = action.get().getInputSchema();
+
+                if (inputSchema.isPresent()) {
+
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("performative", "achieve");
+                    payload.put("sender", "omi");
+                    payload.put("receiver", "bob");
+                    payload.put("content", String.format("%s",goal));
+                    payload.put("msgId", "3");
+
+                    request.setObjectPayload((ObjectSchema) inputSchema.get(), payload);
+
+                    TDHttpResponse response = request.execute();
+
+                    System.out.println("Status code: " + response.getStatusCode());
+
+                } else {
+
+                    System.out.println("Input schema not found.");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -14,4 +14,7 @@ public class MissionDTO {
 
     @Getter
     private String schemeId;
+
+    @Getter
+    private String goalId;
 }

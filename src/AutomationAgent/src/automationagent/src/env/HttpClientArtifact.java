@@ -26,6 +26,7 @@ import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
+import jason.stdlib.sort;
 
 import static org.eclipse.rdf4j.model.util.Values.iri;
 
@@ -185,6 +186,51 @@ public class HttpClientArtifact extends Artifact{
     
         success.set(true);
     }
+@OPERATION
+public void commitToMission(String missionId, String schemeId, String goalId, OpFeedbackParam<Boolean> success) {
+    try {
+        ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, OMI);
+
+        Optional<ActionAffordance> action = td.getActionByName("commitToMission");
+
+        if (action.isPresent()) {
+            TDHttpRequest request = new TDHttpRequest(
+                action.get().getFirstFormForSubProtocol(TD.invokeAction, "http").orElseThrow(),
+                TD.invokeAction
+            );
+
+            request.addHeader("Slug", SLUG);
+            request.addHeader("X-Agent-WebID", WEBID);
+
+            Optional<DataSchema> inputScheme = action.get().getInputSchema();
+
+            if (inputScheme.isPresent()) {
+                Map<String, Object> payload = new HashMap<>();
+
+                payload.put("agentId", WEBID);
+                payload.put("missionId", missionId);
+                payload.put("schemeId", schemeId);
+                payload.put("goalId", goalId);
+
+                request.setObjectPayload((ObjectSchema) inputScheme.get(), payload);
+                TDHttpResponse response = request.execute();
+
+                System.out.println("Status code: " + response.getStatusCode());
+                
+            } else {
+                System.out.println("Input scheme not found.");
+            }
+
+        } else {
+            System.out.println("Action not found.");
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+
     /* 
      * 
      */

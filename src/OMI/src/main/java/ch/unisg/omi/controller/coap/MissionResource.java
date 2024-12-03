@@ -32,7 +32,8 @@ public class MissionResource extends CoapResource {
         MissionCommand command = new MissionCommand(
                 missionDTO.getAgentId(),
                 missionDTO.getMissionId(),
-                missionDTO.getSchemeId()
+                missionDTO.getSchemeId(),
+                missionDTO.getGoalId()
         );
 
         missionUseCase.commitMission(command);

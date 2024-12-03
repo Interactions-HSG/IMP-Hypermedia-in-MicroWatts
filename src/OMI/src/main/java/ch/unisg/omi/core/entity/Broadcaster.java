@@ -58,17 +58,12 @@ public class Broadcaster {
 
             SchemeInstance schemeInstance = organization.getOrgEntity().startScheme("monitoring_scheme");
             schemeInstance.addResponsibleGroup(groupName);
-            
-            organization.getOrgEntity().findGroup(groupName).getPlayers().forEach((player) -> {
-                System.out.println("Player: " + player.getPlayer());
-                System.out.println("Roles: " + player.getRole());
 
+            organization.getOrgEntity().findGroup(groupName).getPlayers().forEach((player) -> {
 
                 player.getPermissions().forEach(permission -> {
                     permission.getMission().getGoals().forEach(goal -> {
-
-                        // TODO: Send achieve to agent with the goal -> Agent performs the plan and send the goal id back
-                        System.out.println("Goal: " + goal);
+                        agentPort.sendGoal(player.getPlayer(), goal);
                     });
                 });
 

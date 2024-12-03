@@ -79,6 +79,10 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
     .print("Does not know RoleId and GroupId");
     .wait(5000);
     !adoptRole.
+
++!automate_telemetry : true <-
+    commitToMission("telemetry_automating_mission", "monitoring_scheme", "automate_telemetry", Success);
+    .print("It works.").
 /*
 // Currently hardcoded EntryURI will be used
 +!findHyperMediaEnvironment : entrypoint(URI) <- 

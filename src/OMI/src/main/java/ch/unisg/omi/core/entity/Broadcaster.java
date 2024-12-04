@@ -1,6 +1,7 @@
 package ch.unisg.omi.core.entity;
 
 import ch.unisg.omi.core.port.out.AgentPort;
+import ch.unisg.omi.core.service.MissionService;
 import lombok.RequiredArgsConstructor;
 import moise.common.MoiseCardinalityException;
 import moise.common.MoiseConsistencyException;
@@ -19,7 +20,7 @@ public class Broadcaster {
 
     private final Organization organization = Organization.getOrganization();
     private final AgentPort agentPort;
-
+    private final MissionService mission;
 
     @Async
     public CompletableFuture<String> send(String groupName) throws InterruptedException {
@@ -59,23 +60,30 @@ public class Broadcaster {
             SchemeInstance schemeInstance = organization.getOrgEntity().startScheme("monitoring_scheme");
             schemeInstance.addResponsibleGroup(groupName);
 
+
             organization.getOrgEntity().findGroup(groupName).getPlayers().forEach((player) -> {
 
                 player.getPermissions().forEach(permission -> {
+
                     permission.getMission().getGoals().forEach(goal -> {
-                        agentPort.sendGoal(player.getPlayer(), goal);
+
+                        // TODO: Notify resource change for sensing agent to provide goals
+                        // TODO: Group resource ändern mit goals und ids
+                        agentPort.sendGoal(player.getPlayer(), goal); // TODO: SchemeId und MissionId permission.getScheme, permission.getMission
+                        agentPort.notifyGoal(player.getPlayer(), goal, groupName); // TODO: SchemeId und MissionId permission.getScheme, permission.getMission
+
                     });
                 });
 
             });
 
+            //organization.getOrgEntity().finishScheme(schemeInstance); // TODO: End of ...
+            // TODO: Notification for the resource
+
         } catch (MoiseException eMoise) {
             eMoise.printStackTrace();
         }
 
-
-        // TODO: Next while loop to "achieve" plans for all missionplayer?
-
-        return CompletableFuture.completedFuture("group is well-formed.");
+        return CompletableFuture.completedFuture("Finished.");
     }
 }

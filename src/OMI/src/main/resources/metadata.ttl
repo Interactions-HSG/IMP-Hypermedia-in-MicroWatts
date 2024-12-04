@@ -10,7 +10,7 @@
         td:name "adoptRole";
         td:hasForm [
             htv:methodName "POST" ;
-            hctl:hasTarget <coap://omi:5686/room1> ;
+            hctl:hasTarget <coap://omi:5686/groupId> ;
             hctl:forContentType "text/plain" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "coap"
@@ -35,10 +35,42 @@
         ]
     ], [
         a td:ActionAffordance;
+        td:name "getGoals";
+        td:hasForm [
+            htv:methodName "GET" ;
+            hctl:hasTarget <coap://omi:5686/groupId> ;
+            hctl:forContentType "text/plain" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "coap"
+        ], [
+            htv:methodName "GET" ;
+            hctl:hasTarget <http://omi:7500/roles> ;
+            hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "http"
+        ]
+    ], [
+       a td:ActionAffordance;
+       td:name "getRoles";
+       td:hasForm [
+           htv:methodName "GET" ;
+           hctl:hasTarget <coap://omi:5686/groupId/roles> ;
+           hctl:forContentType "text/plain" ;
+           hctl:hasOperationType td:invokeAction ;
+           hctl:forSubProtocol "coap"
+       ], [
+           htv:methodName "GET" ;
+           hctl:hasTarget <http://omi:7500/roles> ;
+           hctl:forContentType "application/json" ;
+           hctl:hasOperationType td:invokeAction ;
+           hctl:forSubProtocol "http"
+       ]
+    ], [
+        a td:ActionAffordance;
         td:name "commitToMission";
         td:hasForm [
-            htv:methodName "POST" ;
-            hctl:hasTarget <coap://omi:5686/room1> ;
+            htv:methodName "PUT" ;
+            hctl:hasTarget <coap://omi:5686/groupId> ;
             hctl:forContentType "text/plain" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "coap"

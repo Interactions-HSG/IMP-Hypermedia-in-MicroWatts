@@ -16,7 +16,6 @@ public class RoleController {
 
     private final RoleUseCase roleUseCase;
 
-    // TODO: Add param for role id to allow agents to adopt a role.
     @PostMapping(path = "/roles")
     public ResponseEntity<String> addRole(
             @RequestBody RoleDTO roleDTO

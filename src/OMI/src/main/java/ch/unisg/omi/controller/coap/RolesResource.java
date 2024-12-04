@@ -22,34 +22,17 @@ public class RolesResource extends CoapResource {
         this.server = CoapServerConfig.getInstance();
     }
 
+    /*
+     *
+     */
     @Override
     public void handleGET(CoapExchange exchange) {
-
+        // TODO: Return list of roles
         Request request = exchange.advanced().getRequest();
 
-        String roles = roleUseCase.getRoles();
-
         Response response = new Response(CoAP.ResponseCode.CONTENT);
-        response.setPayload(roles);
+        // response.setPayload(roles);
 
         exchange.respond(response);
-    }
-
-    @Override
-    public void handlePOST(CoapExchange exchange) {
-
-        Request request = exchange.advanced().getRequest();
-
-        RoleCommand command = new RoleCommand("","","");
-        roleUseCase.adoptRole(command);
-
-        Resource roles = server.getRoot().getChild("roles");
-        roles.add(new RoleResource(request.getPayloadString()));
-
-        Response response = new Response(CoAP.ResponseCode.CONTENT);
-        response.setPayload("Test!");
-        exchange.respond(response);
-
-        // TODO: Add agent to role
     }
 }

@@ -11,7 +11,6 @@ public class Organization {
     private Organization(String name, String uri) {
         try {
             this.orgEntity = OE.createOE(name, uri);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

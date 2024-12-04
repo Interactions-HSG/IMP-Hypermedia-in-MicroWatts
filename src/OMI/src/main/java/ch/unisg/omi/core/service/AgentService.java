@@ -5,13 +5,9 @@ import ch.unisg.omi.core.port.in.AgentUseCase;
 import ch.unisg.omi.core.port.out.AgentPort;
 import lombok.RequiredArgsConstructor;
 import moise.oe.OEAgent;
-import moise.oe.RolePlayer;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service("Agent")

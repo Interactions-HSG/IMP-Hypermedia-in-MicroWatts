@@ -1,6 +1,8 @@
 package ch.unisg.omi.controller.http;
 
 import ch.unisg.omi.config.YggdrasilConfig;
+import ch.unisg.omi.controller.coap.GroupResource;
+import ch.unisg.omi.controller.coap.RolesResource;
 import ch.unisg.omi.core.port.in.BroadcastUseCase;
 import ch.unisg.omi.core.port.in.GroupUseCase;
 import ch.unisg.omi.core.port.in.SchemeUseCase;
@@ -36,6 +38,9 @@ public class WorkspaceController {
 
         // Add a new organization group for the workspace
         groupUseCase.addGroup(workspaceName);
+
+        // Create a new group resource
+        GroupResource groupResource = new GroupResource(workspaceName, groupUseCase);
 
         // Start broadcasting to agents within the group
         broadcastUseCase.broadcast(workspaceName);

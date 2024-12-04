@@ -8,6 +8,8 @@ import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
+import ch.unisg.omi.config.CoapServerConfig;
+import ch.unisg.omi.controller.coap.GroupResource;
 import ch.unisg.omi.core.port.out.AgentPort;
 import com.google.gson.Gson;
 import moise.oe.OEAgent;
@@ -29,6 +31,9 @@ import java.util.Optional;
 @Primary
 @Component
 public class AgentAdapter implements AgentPort {
+
+
+    private final CoapServerConfig server = CoapServerConfig.getInstance();
 
     @Override
     public void sendGroupName(String agentId, String groupName) {
@@ -69,6 +74,8 @@ public class AgentAdapter implements AgentPort {
 
                     System.out.println("Input schema not found.");
                 }
+            } else {
+                System.out.println("Action not found.");
             }
 
         } catch (Exception e) {
@@ -166,5 +173,14 @@ public class AgentAdapter implements AgentPort {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void notifyGoal(OEAgent agentId, Goal goal, String groupId) {
+
+        // TODO: Group resource update
+        var group = (GroupResource) server.getRoot().getChild(groupId);
+        group.addGoal(goal);
+        group.notifyResource();
     }
 }

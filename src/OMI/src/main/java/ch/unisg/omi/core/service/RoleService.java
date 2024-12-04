@@ -38,8 +38,8 @@ public class RoleService implements RoleUseCase {
     }
 
     @Override
-    public String getRoles() {
+    public void getRoles() {
+        // TODO: Implement get roles
         Collection<Role> roles = organization.getOrgEntity().getOS().getSS().getRolesDef();
-        return String.valueOf(roles);
     }
 }

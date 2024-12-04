@@ -17,13 +17,14 @@ public class MissionService implements MissionUseCase {
 
     public void commitMission(MissionCommand command) {
 
+
         try {
             MissionPlayer missionPlayer = organization
                     .getOrgEntity()
                     .getAgent(command.getAgentId())
                     .commitToMission(command.getMissionId(), command.getSchemeId());
 
-            missionPlayer.getScheme().getGoal("").setAchieved(missionPlayer.getPlayer());
+            missionPlayer.getScheme().getGoal(command.getGoalId()).setAchieved(missionPlayer.getPlayer());
 
         } catch (Exception e) {
             e.printStackTrace();

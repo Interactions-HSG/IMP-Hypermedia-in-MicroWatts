@@ -7,4 +7,5 @@ public interface AgentPort {
     void sendGroupName(String agentId, String groupName);
     void sendRoles(String agentId, Object[] roles);
     void sendGoal(OEAgent agentId, Goal goal);
+    void notifyGoal(OEAgent agentId, Goal goal, String groupId);
 }

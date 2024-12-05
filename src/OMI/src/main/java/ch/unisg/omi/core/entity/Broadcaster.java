@@ -3,15 +3,10 @@ package ch.unisg.omi.core.entity;
 import ch.unisg.omi.core.port.out.AgentPort;
 import ch.unisg.omi.core.service.MissionService;
 import lombok.RequiredArgsConstructor;
-import moise.common.MoiseCardinalityException;
-import moise.common.MoiseConsistencyException;
 import moise.common.MoiseException;
-import moise.oe.PlanInstance;
 import moise.oe.SchemeInstance;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -66,7 +61,7 @@ public class Broadcaster {
                 player.getPermissions().forEach(permission -> {
 
                     permission.getMission().getGoals().forEach(goal -> {
-                        
+
                         agentPort.sendGoal(player.getPlayer(), goal, groupName, permission.getMission(), permission.getScheme());
                         agentPort.notifyGoal(player.getPlayer(), goal, groupName, permission.getMission(), permission.getScheme());
 

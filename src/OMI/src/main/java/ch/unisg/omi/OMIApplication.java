@@ -2,14 +2,9 @@ package ch.unisg.omi;
 
 import ch.unisg.omi.config.CoapServerConfig;
 import ch.unisg.omi.config.YggdrasilConfig;
-import ch.unisg.omi.controller.coap.GroupResource;
 import ch.unisg.omi.controller.coap.RolesResource;
-import ch.unisg.omi.core.port.in.GroupUseCase;
-import ch.unisg.omi.core.service.GroupService;
-import ch.unisg.omi.infrastructure.adapter.http.GroupAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 
 @SpringBootApplication
 public class OMIApplication {
@@ -26,6 +21,7 @@ public class OMIApplication {
 
 		System.out.println("Setting up Yggdrasil...");
 		YggdrasilConfig yggdrasil = YggdrasilConfig.getInstance();
+
 		yggdrasil.subscribe("http://yggdrasil:8080/workspaces/", "http://omi:7500/workspaces");
 	}
 }

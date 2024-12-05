@@ -80,8 +80,9 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
     .wait(5000);
     !adoptRole.
 
-+!automate_telemetry : true <-
-    commitToMission("telemetry_automating_mission", "monitoring_scheme", "automate_telemetry", Success);
++!automate_telemetry(Mission, Scheme) : true <-
+    .print(Mission, Scheme);
+    commitToMission(Mission, Scheme, "automate_telemetry", Success);
     .print("It works.").
 /*
 // Currently hardcoded EntryURI will be used

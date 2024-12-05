@@ -66,19 +66,17 @@ public class Broadcaster {
                 player.getPermissions().forEach(permission -> {
 
                     permission.getMission().getGoals().forEach(goal -> {
-
-                        // TODO: Notify resource change for sensing agent to provide goals
-                        // TODO: Group resource ändern mit goals und ids
-                        agentPort.sendGoal(player.getPlayer(), goal); // TODO: SchemeId und MissionId permission.getScheme, permission.getMission
-                        agentPort.notifyGoal(player.getPlayer(), goal, groupName); // TODO: SchemeId und MissionId permission.getScheme, permission.getMission
+                        
+                        agentPort.sendGoal(player.getPlayer(), goal, groupName, permission.getMission(), permission.getScheme());
+                        agentPort.notifyGoal(player.getPlayer(), goal, groupName, permission.getMission(), permission.getScheme());
 
                     });
                 });
 
             });
 
-            //organization.getOrgEntity().finishScheme(schemeInstance); // TODO: End of ...
-            // TODO: Notification for the resource
+            // TODO: What next?
+            //organization.getOrgEntity().finishScheme(schemeInstance);
 
         } catch (MoiseException eMoise) {
             eMoise.printStackTrace();

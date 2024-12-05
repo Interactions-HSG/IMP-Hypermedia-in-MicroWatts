@@ -8,18 +8,11 @@ import ch.unisg.omi.core.port.in.RoleUseCase;
 import ch.unisg.omi.core.port.in.command.MissionCommand;
 import ch.unisg.omi.core.port.in.command.RoleCommand;
 import com.google.gson.Gson;
-import moise.os.fs.Goal;
-import moise.os.fs.Mission;
-import moise.os.ss.Role;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
-import org.eclipse.californium.core.coap.Request;
-import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ObservableResource;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 public class GroupResource extends CoapResource implements ObservableResource {

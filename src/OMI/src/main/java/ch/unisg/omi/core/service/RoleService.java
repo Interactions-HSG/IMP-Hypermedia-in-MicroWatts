@@ -36,10 +36,4 @@ public class RoleService implements RoleUseCase {
         }
 
     }
-
-    @Override
-    public void getRoles() {
-        // TODO: Implement get roles
-        Collection<Role> roles = organization.getOrgEntity().getOS().getSS().getRolesDef();
-    }
 }

@@ -1,5 +1,8 @@
 package ch.unisg.omi.core.port.out;
 
+import moise.os.CardinalitySet;
+import moise.os.ss.Role;
+
 public interface GroupPort {
-    public void createGroupResource(String name);
+    void updateRoles(String groupId, CardinalitySet<Role> roleList);
 }

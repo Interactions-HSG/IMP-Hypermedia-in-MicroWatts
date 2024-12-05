@@ -5,6 +5,7 @@ import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
+import ch.unisg.ics.interactions.wot.td.schemas.ArraySchema;
 import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
@@ -13,7 +14,9 @@ import ch.unisg.omi.controller.coap.GroupResource;
 import ch.unisg.omi.core.port.out.AgentPort;
 import com.google.gson.Gson;
 import moise.oe.OEAgent;
+import moise.oe.SchemeInstance;
 import moise.os.fs.Goal;
+import moise.os.fs.Mission;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -23,10 +26,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Primary
 @Component
@@ -130,7 +130,7 @@ public class AgentAdapter implements AgentPort {
     }
 
     @Override
-    public void sendGoal(OEAgent agentId, Goal goal) {
+    public void sendGoal(OEAgent agentId, Goal goal, String groupId, Mission mission, SchemeInstance scheme) {
 
         try {
             ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, agentId.toString());
@@ -154,7 +154,7 @@ public class AgentAdapter implements AgentPort {
                     payload.put("performative", "achieve");
                     payload.put("sender", "omi");
                     payload.put("receiver", "bob");
-                    payload.put("content", String.format("%s",goal));
+                    payload.put("content", String.format("%s(%s,%s)",goal, mission.getId(), scheme.getId()));
                     payload.put("msgId", "3");
 
                     request.setObjectPayload((ObjectSchema) inputSchema.get(), payload);
@@ -176,11 +176,19 @@ public class AgentAdapter implements AgentPort {
     }
 
     @Override
-    public void notifyGoal(OEAgent agentId, Goal goal, String groupId) {
+    public void notifyGoal(OEAgent agentId, Goal goal, String groupId, Mission mission, SchemeInstance schemeInstance) {
 
-        // TODO: Group resource update
         var group = (GroupResource) server.getRoot().getChild(groupId);
-        group.addGoal(goal);
+
+        System.out.println("Adapter: " + goal.getId() + mission.getId() + schemeInstance.getId());
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("goalId", goal.getId());
+        hashMap.put("missionId", mission.getId());
+        hashMap.put("schemeId", schemeInstance.getId());
+
+        group.addGoal(hashMap);
+
         group.notifyResource();
     }
 }

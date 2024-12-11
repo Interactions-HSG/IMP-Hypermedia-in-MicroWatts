@@ -1,5 +1,13 @@
 package ch.unisg.db.config;
 
+import ch.unisg.ics.interactions.wot.td.ThingDescription;
+import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
+import ch.unisg.ics.interactions.wot.td.affordances.Form;
+import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
+import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
+import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
+import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
+import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,15 +15,14 @@ import java.util.Optional;
 
 public class Yggdrasil {
 
-    public static String ENTRYPOINT = "http://yggdrasil:8080/";
+    public static String ENTRYPOINT = "http://127.0.0.1:8080/";
     public static String WORKSPACE = "root";
     public static String name = "datalake";
 
     public static void main() throws IOException {
-        /**
-
         // read the thing description of yggdrasil
-        ThingDescription tdYggdrasil = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT);
+        ThingDescription
+            tdYggdrasil = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, ENTRYPOINT);
 
 
         // read the thing description of the workspace
@@ -55,6 +62,5 @@ public class Yggdrasil {
         } else {
             System.out.println("No action found");
         }
-        */
     }
 }

@@ -33,7 +33,9 @@ public class GroupResource extends CoapResource implements ObservableResource {
     }
 
     public GroupResource(String name, GroupUseCase groupUseCase, RoleUseCase roleUseCase, MissionUseCase missionUseCase) {
-        super(name);
+        super(name, true);
+        this.setObservable(true);
+        System.out.println("The resource: " + name + " is observable: " + this.isObservable());
         this.groupUseCase = groupUseCase;
         this.roleUseCase = roleUseCase;
         this.missionUseCase = missionUseCase;

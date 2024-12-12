@@ -1,30 +1,17 @@
 package ch.unisg.omi.controller.http;
 
-import ch.unisg.ics.interactions.wot.td.ThingDescription;
-import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
-import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
-import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
-import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
-import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
-import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
-import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
-import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
-import ch.unisg.omi.core.entity.Organization;
 import ch.unisg.omi.core.port.in.AgentUseCase;
+import java.io.StringReader;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.util.Models;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,12 +21,29 @@ public class ArtifactController {
 
     @PostMapping(path = "/workspaces/artifacts")
     public ResponseEntity<String> newArtifact(
-            @RequestHeader("Location") String agentId
+            @RequestHeader("Location") String agentId,
+            @RequestBody String body
     ) {
+        try {
+            // Parse RDF body
+            Model rdfModel = Rio.parse(new StringReader(body), "http://yggdrasil:8080/", RDFFormat.TURTLE);
 
-        System.out.println("New artifact " + agentId + " is created.");
+            // Check if the agentId is part of the RDF graph
+            boolean containsAgent = Models.subjectIRIs(rdfModel)
+                .stream()
+                .anyMatch(iri -> iri.stringValue().contains(agentId));
 
-        agentUseCase.addAgent(agentId);
+            if (containsAgent) {
+                System.out.println("New artifact " + agentId + " is created.");
+                agentUseCase.addAgent(agentId);
+            } else {
+                System.out.println("Artifact " + agentId + " is deleted.");
+                agentUseCase.removeAgent(agentId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Invalid RDF body.");
+        }
 
         return ResponseEntity.ok().body("OK");
     }

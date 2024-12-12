@@ -1,5 +1,6 @@
 package ch.unisg.db.controllers;
 
+import ch.unisg.db.db.Database;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class TelemetryController extends CoapResource {
 
-    HashMap<String, Object> telemetries = new HashMap<>();
+    private final Database database = Database.getInstance();
 
     public TelemetryController(String uri) {
         super(uri);
@@ -21,7 +22,8 @@ public class TelemetryController extends CoapResource {
 
     @Override
     public void handleGET(CoapExchange exchange) {
-
+        exchange.accept();
+        final var telemetries = database.getAll();
         exchange.respond(telemetries.toString());
     }
 
@@ -30,9 +32,9 @@ public class TelemetryController extends CoapResource {
         exchange.accept();
         final var payload = exchange.getRequestText();
 
-        Date test = new Timestamp(System.currentTimeMillis());
+        String key = payload.split(",")[0];
 
-        telemetries.put(test.toString(), payload);
+        database.put(key, payload);
 
         System.out.println("Received payload: " + payload);
         exchange.respond("Received payload.");

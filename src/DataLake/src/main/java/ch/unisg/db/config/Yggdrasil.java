@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class Yggdrasil {
 
-    public static String ENTRYPOINT = "http://127.0.0.1:8080/";
+    public static String ENTRYPOINT = "http://yggdrasil:8080/";
     public static String WORKSPACE = "root";
     public static String name = "datalake";
 

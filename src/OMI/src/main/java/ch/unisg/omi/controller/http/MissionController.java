@@ -27,8 +27,8 @@ public class MissionController {
                 missionDTO.getGoalId()
         );
 
-        System.out.println(command);
 
+        System.out.println("[MissionController] Mission command: " + command);
         missionUseCase.commitMission(command);
 
         return ResponseEntity.ok().body("Mission committed");

@@ -5,61 +5,33 @@
 
 <#artifact> a td:Thing;
 
-    td:hasActionAffordance [ a td:ActionAffordance;
-        td:name "adoptRole";
+    td:hasActionAffordance [ 
+        a td:ActionAffordance;
+        td:name "advertiseMessage";
         td:hasForm [
             htv:methodName "POST" ;
-            hctl:hasTarget <coap://omi:5686/roles> ;
-            hctl:forContentType "text/plain" ;
-            hctl:hasOperationType td:invokeAction ;
-            hctl:forSubProtocol "coap"
-        ], [
-            htv:methodName "POST" ;
-            hctl:hasTarget <http://omi:7500/roles> ;
-            hctl:forContentType "text/plain" ;
+            hctl:hasTarget <http://aa:8081/agents/bob/inbox> ;
+            hctl:forContentType "application/json" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "http"
-        ]
-    ], [
-        td:name "getRoles" ;
-        td:hasForm [
-            htv:methodName "GET" ;
-            hctl:hasTarget <coap://omi:5686/roles> ;
-            hctl:hasOperationType td:invokeAction ;
-            hctl:forSubProtocol "coap"
-        ], [
-            htv:methodName "GET" ;
-            hctl:hasTarget <http://omi:5686/roles> ;
-            hctl:hasOperationType td:invokeAction ;
-            hctl:forSubProtocol "http"
-        ]
-    ], [
-        td:name "joinWorkspace";
-        td:hasForm [
-            htv:methodName "POST" ;
-            hctl:hasTarget <coap://omi:5686/agents> ;
-            hctl:forContentType "text/plain" ;
-            hctl:hasOperationType td:invokeAction ;
-            hctl:forSubProtocol "coap"
-        ], [
-            htv:methodName "POST" ;
-            hctl:hasTarget <http://omi:7500/agents> ;
-            hctl:forContentType "text/plain" ;
-            hctl:hasOperationType td:invokeAction ;
-            hctl:forSubProtocol "http"
-        ]
-    ], [
-        td:name "getAgents";
-        td:hasForm [
-            htv:methodName "GET" ;
-            hctl:hasTarget <coap://omi:5686/agents> ;
-            hctl:hasOperationType td:invokeAction ;
-            hctl:forSubProtocol "coap"
-        ], [
-            htv:methodName "GET" ;
-            hctl:hasTarget <http://omi:5686/agents> ;
-            hctl:hasOperationType td:invokeAction ;
-            hctl:forSubProtocol "http"
-        ]
-    ];
+        ] ;
+        td:hasInputSchema [ a js:ObjectSchema;
+            js:properties [
+                a js:StringSchema;
+                js:propertyName "performative"
+            ], [
+                a js:StringSchema;
+                js:propertyName "sender"
+            ], [
+                a js:StringSchema;
+                js:propertyName "receiver"
+            ], [
+                a js:StringSchema;
+                js:propertyName "content"
+            ], [
+                a js:StringSchema;
+                js:propertyName "msgId"
+            ] ;
+        ] 
+    ] ;
 .

@@ -1,5 +1,6 @@
 package ch.unisg.omi.controller.http;
 
+import ch.unisg.omi.controller.dto.RoleDTO;
 import ch.unisg.omi.core.port.in.RoleUseCase;
 import ch.unisg.omi.core.port.in.command.RoleCommand;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,16 @@ public class RoleController {
 
     private final RoleUseCase roleUseCase;
 
-    // TODO: Add param for role id to allow agents to adopt a role.
     @PostMapping(path = "/roles")
-    public ResponseEntity<String> addRole(@RequestBody String test) {
+    public ResponseEntity<String> addRole(
+            @RequestBody RoleDTO roleDTO
+    ) {
 
-        RoleCommand command = new RoleCommand("","","");
+        RoleCommand command = new RoleCommand(
+                roleDTO.getAgentId(),
+                roleDTO.getRoleId(),
+                roleDTO.getGroupId()
+        );
 
         roleUseCase.adoptRole(command);
 

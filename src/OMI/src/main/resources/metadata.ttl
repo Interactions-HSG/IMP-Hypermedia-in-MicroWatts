@@ -5,7 +5,8 @@
 
 <#artifact> a td:Thing;
 
-    td:hasActionAffordance [ a td:ActionAffordance;
+    td:hasActionAffordance [
+        a td:ActionAffordance;
         td:name "adoptRole";
         td:hasForm [
             htv:methodName "POST" ;
@@ -19,18 +20,81 @@
             hctl:forContentType "application/json" ;
             hctl:hasOperationType td:invokeAction ;
             hctl:forSubProtocol "http"
-        ]
+        ] ;
         td:hasInputSchema [ a js:ObjectSchema;
             js:properties [
                 a js:StringSchema;
                 js:propertyName "agentId"
             ], [
                 a js:StringSchema;
-                js:propertyName "groupName"
+                js:propertyName "groupId"
             ], [
                 a js:StringSchema;
                 js:propertyName "roleId"
             ]
+        ]
+    ], [
+        a td:ActionAffordance;
+        td:name "getGoals";
+        td:hasForm [
+            htv:methodName "GET" ;
+            hctl:hasTarget <coap://omi:5686/groupId> ;
+            hctl:forContentType "text/plain" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "coap"
+        ], [
+            htv:methodName "GET" ;
+            hctl:hasTarget <http://omi:7500/roles> ;
+            hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "http"
+        ]
+    ], [
+       a td:ActionAffordance;
+       td:name "getRoles";
+       td:hasForm [
+           htv:methodName "GET" ;
+           hctl:hasTarget <coap://omi:5686/groupId/roles> ;
+           hctl:forContentType "text/plain" ;
+           hctl:hasOperationType td:invokeAction ;
+           hctl:forSubProtocol "coap"
+       ], [
+           htv:methodName "GET" ;
+           hctl:hasTarget <http://omi:7500/roles> ;
+           hctl:forContentType "application/json" ;
+           hctl:hasOperationType td:invokeAction ;
+           hctl:forSubProtocol "http"
+       ]
+    ], [
+        a td:ActionAffordance;
+        td:name "commitToMission";
+        td:hasForm [
+            htv:methodName "PUT" ;
+            hctl:hasTarget <coap://omi:5686/groupId> ;
+            hctl:forContentType "text/plain" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "coap"
+        ], [
+            htv:methodName "POST" ;
+            hctl:hasTarget <http://omi:7500/missions> ;
+            hctl:forContentType "application/json" ;
+            hctl:hasOperationType td:invokeAction ;
+            hctl:forSubProtocol "http"
+        ] ;
+        td:hasInputSchema [ a js:ObjectSchema;
+            js:properties [
+                a js:StringSchema;
+                js:propertyName "agentId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "missionId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "schemeId"
+            ], [
+                a js:StringSchema;
+                js:propertyName "goalId"
+           ]
         ]
     ], [
         td:name "joinGroup" ;

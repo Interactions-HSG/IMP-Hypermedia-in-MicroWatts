@@ -9,37 +9,41 @@
     <structural-specification>
 
         <role-definitions>
-            <role id="automation_agent"></role>
-            <role id="sensing_agent"></role>
+            <role id="automation_agent"/>
+            <role id="sensing_agent"/>
         </role-definitions>
 
-        <group-specification id="group_room_automation">
+        <group-specification id="monitoring_team">
             <roles>
                 <role id="automation_agent" min="1" max="1" />
-                <role id="sensing_agent" min="1" max="2" />
+                <role id="sensing_agent" min="1" max="1" />
             </roles>
         </group-specification>
 
     </structural-specification>
 
     <functional-specification>
-        <scheme id="measure_telemetry">
-            <goal id="goal_measure_telemetry">
+        <scheme id="monitoring_scheme">
+            <goal id="monitor_telemetry">
                 <plan operator="parallel">
-                    <goal id="goal_measure_room_temperature" min="1"></goal>
-                    <goal id="goal_measure_room_humidity"></goal>
+                    <goal id="measure_room_temperature" min="1"/>
+                    <goal id="measure_room_humidity"/>
+                    <goal id="automate_telemetry"/>
                 </plan>
             </goal>
-            <mission id="mission_measure_telemetry" min="1" max="2">
-                <goal id="goal_measure_room_temperature" />
-                <goal id="goal_measure_room_humidity" />
+            <mission id="telemetry_measuring_mission" min="1" max="2">
+                <goal id="measure_room_temperature" />
+                <goal id="measure_room_humidity" />
+            </mission>
+            <mission id="telemetry_automating_mission" min="1" max="2">
+                <goal id="automate_telemetry" />
             </mission>
         </scheme>
     </functional-specification>
 
     <normative-specification>
-        <norm id="norm1" type="obligation" role="automation_agent" mission="mission_measure_telemetry" />
-        <norm id="norm2" type="obligation" role="sensing_agent" mission="mission_measure_telemetry" />
+        <norm id="norm1" type="obligation" role="automation_agent" mission="telemetry_automating_mission" />
+        <norm id="norm2" type="obligation" role="sensing_agent" mission="telemetry_measuring_mission" />
     </normative-specification>
 
 </organisational-specification>

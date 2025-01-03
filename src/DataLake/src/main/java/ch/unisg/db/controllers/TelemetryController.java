@@ -12,8 +12,7 @@ import java.util.List;
 
 public class TelemetryController extends CoapResource {
 
-
-    private final Database db = Database.getInstance();
+    private final Database database = Database.getInstance();
 
     public TelemetryController(String uri) {
         super(uri);
@@ -23,8 +22,9 @@ public class TelemetryController extends CoapResource {
 
     @Override
     public void handleGET(CoapExchange exchange) {
-
-        exchange.respond(db.getAllData().toString());
+        exchange.accept();
+        final var telemetries = database.getAll();
+        exchange.respond(telemetries.toString());
     }
 
     @Override
@@ -32,9 +32,9 @@ public class TelemetryController extends CoapResource {
         exchange.accept();
         final var payload = exchange.getRequestText();
 
-        String[] parts = payload.split(",");
-        String key = parts[0];
-        db.addData(key, payload);
+        String key = payload.split(",")[0];
+
+        database.put(key, payload);
 
         System.out.println("Received payload: " + payload);
         exchange.respond("Received payload.");

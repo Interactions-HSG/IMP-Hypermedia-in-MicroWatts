@@ -7,11 +7,14 @@ public class MissionDTO {
     public static final String MEDIA_TYPE = "application/mission+json";
 
     @Getter
-    private String agentName;
+    private String agentId;
 
     @Getter
-    private String missionName;
+    private String missionId;
 
     @Getter
-    private String schemeName;
+    private String schemeId;
+
+    @Getter
+    private String goalId;
 }

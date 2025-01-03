@@ -22,6 +22,7 @@ public class RoleResource extends CoapResource {
 
     @Override
     public void handleGET(CoapExchange exchange) {
+        System.out.println("[RoleResource] GET request received");
 
         Request request = exchange.advanced().getRequest();
 
@@ -36,13 +37,14 @@ public class RoleResource extends CoapResource {
         /*
             Agent adopts a role
          */
+        System.out.println("[RoleResource] POST request received");
 
         Request request = exchange.advanced().getRequest();
 
         Gson gson = new Gson();
         RoleDTO roleDTO = gson.fromJson(request.getPayloadString(), RoleDTO.class);
 
-        RoleCommand command = new RoleCommand(roleDTO.getAgentName(), roleDTO.getRoleName(), roleDTO.getGroupName());
+        RoleCommand command = new RoleCommand(roleDTO.getAgentId(), roleDTO.getRoleId(), roleDTO.getGroupId());
 
         roleUseCase.adoptRole(command);
 

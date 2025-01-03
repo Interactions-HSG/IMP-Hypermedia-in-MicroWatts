@@ -29,7 +29,7 @@ public class DataLakeApplication {
 
         /** set up yggdrasil */
         System.out.println("Setting up yggdrasil...");
-        // Yggdrasil.main();
+        Yggdrasil.main();
 
         /** Set up coap */
         System.out.println("Setting up Coap...");

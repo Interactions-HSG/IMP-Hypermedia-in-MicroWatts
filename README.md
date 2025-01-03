@@ -105,3 +105,9 @@ Full logic - Constrained Sensing Agent:
 
 
 ++++ add to yggdrasil update messages of new / deleted devices the location header of the device
+
+
+### Assumptions for embedded device
+- give entry point to yggdrasil ( can also be done dynamically with ble)
+- important artifacts are always in the root workspace (makes it easier for demo)
+- names of artifacts & their actions are always the same (makes it easier for demo)

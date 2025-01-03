@@ -29,13 +29,15 @@ public class GroupResource extends CoapResource implements ObservableResource {
     }
 
     public void notifyResource() {
-        this.notifyObserverRelations(null);
+        System.out.println("Resource has changed - Sending Notification");
+        this.changed();
+        //this.notifyObserverRelations(null);
     }
 
     public GroupResource(String name, GroupUseCase groupUseCase, RoleUseCase roleUseCase, MissionUseCase missionUseCase) {
         super(name, true);
+        System.out.println("[GroupResource] Resource created with name: " + name);
         this.setObservable(true);
-        System.out.println("The resource: " + name + " is observable: " + this.isObservable());
         this.groupUseCase = groupUseCase;
         this.roleUseCase = roleUseCase;
         this.missionUseCase = missionUseCase;
@@ -46,12 +48,8 @@ public class GroupResource extends CoapResource implements ObservableResource {
      */
     @Override
     public void handleGET(CoapExchange exchange) {
+        System.out.println("[GroupResource] GET request received");
 
-        System.out.println(this.goals);
-
-        this.goals.forEach(goal -> {
-            System.out.println(goal);
-        });
         exchange.respond(CoAP.ResponseCode.CONTENT, this.goals.toString());
     }
 
@@ -60,7 +58,7 @@ public class GroupResource extends CoapResource implements ObservableResource {
      */
     @Override
     public void handlePOST(CoapExchange exchange) {
-
+        System.out.println("[GroupResource] POST request received");
         try {
 
             Gson gson = new Gson();
@@ -88,7 +86,7 @@ public class GroupResource extends CoapResource implements ObservableResource {
      */
     @Override
     public void handlePUT(CoapExchange exchange) {
-
+        System.out.println("[GroupResource] PUT request received");
         try {
 
             Gson gson = new Gson();
@@ -102,6 +100,8 @@ public class GroupResource extends CoapResource implements ObservableResource {
                     missionDTO.getGoalId()
             );
 
+
+            System.out.println("[GroupResource] Mission command: " + command);
             missionUseCase.commitMission(command);
 
             exchange.respond(CoAP.ResponseCode.CONTINUE);

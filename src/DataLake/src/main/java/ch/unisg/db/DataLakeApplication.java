@@ -3,6 +3,7 @@ package ch.unisg.db;
 import ch.unisg.db.config.DBServer;
 import ch.unisg.db.config.Yggdrasil;
 import ch.unisg.db.controllers.TelemetryController;
+import java.util.HashMap;
 import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.TcpConfig;
 import org.eclipse.californium.elements.config.UdpConfig;

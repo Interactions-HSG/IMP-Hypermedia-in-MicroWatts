@@ -16,6 +16,7 @@ public class MissionResource extends CoapResource {
 
     public MissionResource(String name) {
         super(name);
+        System.out.println("[MissionResource] Resource created with name: " + name);
         this.missionUseCase = new MissionService();
     }
 
@@ -24,6 +25,7 @@ public class MissionResource extends CoapResource {
         /*
             Commit to a mission
          */
+        System.out.println("[MissionResource] POST request received");
         Request request = exchange.advanced().getRequest();
 
         Gson gson = new Gson();

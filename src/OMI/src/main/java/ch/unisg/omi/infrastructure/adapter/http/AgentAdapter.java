@@ -11,6 +11,7 @@ import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
 import ch.unisg.omi.config.CoapServerConfig;
 import ch.unisg.omi.controller.coap.GroupResource;
+import ch.unisg.omi.core.entity.Broadcaster;
 import ch.unisg.omi.core.port.out.AgentPort;
 import com.google.gson.Gson;
 import moise.oe.OEAgent;
@@ -188,6 +189,22 @@ public class AgentAdapter implements AgentPort {
         hashMap.put("schemeId", schemeInstance.getId());
 
         group.addGoal(hashMap);
+
+        group.notifyResource();
+    }
+
+    @Override
+    public void notifyGoal(List<Broadcaster.PlayerInfo> playerInfos) {
+        var group = (GroupResource) server.getRoot().getChild(playerInfos.getFirst().groupId());
+
+        playerInfos.forEach(playerInfo -> {
+            HashMap<String, String> hashMap = new HashMap<>();
+            hashMap.put("goalId", playerInfo.goal().getId());
+            hashMap.put("missionId", playerInfo.mission().getId());
+            hashMap.put("schemeId", playerInfo.scheme().getId());
+
+            group.addGoal(hashMap);
+        });
 
         group.notifyResource();
     }

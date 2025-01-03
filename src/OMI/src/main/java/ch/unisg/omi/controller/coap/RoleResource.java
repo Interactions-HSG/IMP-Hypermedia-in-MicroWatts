@@ -22,6 +22,7 @@ public class RoleResource extends CoapResource {
 
     @Override
     public void handleGET(CoapExchange exchange) {
+        System.out.println("[RoleResource] GET request received");
 
         Request request = exchange.advanced().getRequest();
 
@@ -36,6 +37,7 @@ public class RoleResource extends CoapResource {
         /*
             Agent adopts a role
          */
+        System.out.println("[RoleResource] POST request received");
 
         Request request = exchange.advanced().getRequest();
 

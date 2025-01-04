@@ -58,6 +58,7 @@ public class AgentService implements AgentUseCase {
                 try {
                     organization.getOrgEntity().getAgent(agentName).abortRole(role);
                 } catch (MoiseConsistencyException e) {
+                    System.out.println("[AgentService] Error:" + e);
                     throw new RuntimeException(e);
                 }
             }
@@ -65,6 +66,7 @@ public class AgentService implements AgentUseCase {
             // Remove the agent after aborting all roles
             organization.getOrgEntity().removeAgent(agentName, true);
         } catch (Exception e) {
+            System.out.println("[AgentService] Error:" + e);
             e.printStackTrace();
         }
     }

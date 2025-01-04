@@ -19,20 +19,33 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 public class YggdrasilConfig {
 
-    public static String ENTRYPOINT = "http://yggdrasil:8080/";
+    private static Environment env;
+
+    public static String ENTRYPOINT;
+    public static String BASE;
     public static String WORKSPACE = "root";
     public static String NAME = "omi";
+
+    private YggdrasilConfig(Environment env) {
+        YggdrasilConfig.env = env;
+        initialize();
+    }
 
     /*
      * Set up yggdrasil
      */
-    private YggdrasilConfig() {
+    private void initialize() {
+        ENTRYPOINT = env.getProperty("ENTRYPOINT", "http://127.0.0.1:8080/");
+        BASE = env.getProperty("BASE", "http://127.0.0.1:7500/");
 
         try {
-
             String url = ENTRYPOINT + "workspaces/" + WORKSPACE;
 
             ThingDescription tdWorkspace = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, url);
@@ -45,7 +58,7 @@ public class YggdrasilConfig {
                         .orElseThrow(),
                         TD.invokeAction);
                 requestArtifact.addHeader("Slug", NAME);
-                requestArtifact.addHeader("X-Agent-WebID", "http://omi:7500/");
+                requestArtifact.addHeader("X-Agent-WebID", BASE);
 
                 final var metadata = Files.readString(Path.of("metadata.ttl"));
 
@@ -62,9 +75,14 @@ public class YggdrasilConfig {
         }
     }
 
-    @Getter
-    private static final YggdrasilConfig instance = new YggdrasilConfig();
+    private static YggdrasilConfig instance;
 
+    public static YggdrasilConfig getInstance(Environment env) {
+        if (instance == null) {
+            instance = new YggdrasilConfig(env);
+        }
+        return instance;
+    }
     /*
      * Subscribe to a topic
      */

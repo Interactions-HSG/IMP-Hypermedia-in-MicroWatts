@@ -190,7 +190,7 @@ public class AgentAdapter implements AgentPort {
 
         group.addGoal(hashMap);
 
-        group.notifyResource();
+        group.notifyResource(true);
     }
 
     @Override
@@ -206,6 +206,13 @@ public class AgentAdapter implements AgentPort {
             group.addGoal(hashMap);
         });
 
-        group.notifyResource();
+        group.notifyResource(true);
+    }
+
+    @Override
+    public void notifyGroup(OEAgent agent, String groupId) {
+        System.out.println("[AgentAdapter] notifying Group Update");
+        var group = (GroupResource) server.getRoot().getChild(groupId);
+        group.notifyResource(false);
     }
 }

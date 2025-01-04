@@ -7,6 +7,7 @@ import ch.unisg.omi.controller.coap.RolesResource;
 import ch.unisg.omi.core.port.in.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +15,24 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class WorkspaceController {
 
-    private final YggdrasilConfig yggdrasilConfig = YggdrasilConfig.getInstance();
+    private final Environment env;
+    private final YggdrasilConfig yggdrasilConfig;
     private final GroupUseCase groupUseCase;
     private final MissionUseCase missionUseCase;
     private final BroadcastUseCase broadcastUseCase;
     private final RoleUseCase roleUseCase;
 
     CoapServerConfig server = CoapServerConfig.getInstance();
+
+    @Autowired
+    public WorkspaceController(Environment env, GroupUseCase groupUseCase, MissionUseCase missionUseCase, BroadcastUseCase broadcastUseCase, RoleUseCase roleUseCase) {
+        this.env = env;
+        this.yggdrasilConfig = YggdrasilConfig.getInstance(env);
+        this.groupUseCase = groupUseCase;
+        this.missionUseCase = missionUseCase;
+        this.broadcastUseCase = broadcastUseCase;
+        this.roleUseCase = roleUseCase;
+    }
 
     @PostMapping(path = "/workspaces")
     public ResponseEntity<String> newWorkspace(
@@ -33,7 +45,8 @@ public class WorkspaceController {
 
         System.out.println(location + "/artifacts/");
         // Subscribe to the workspace to listen for new artifacts.
-        yggdrasilConfig.subscribe(location + "/artifacts/", "http://omi:7500/workspaces/artifacts");
+        yggdrasilConfig.subscribe(location + "/artifacts/", YggdrasilConfig.BASE + "workspaces" +
+            "/artifacts");
 
         // Get the workspace name of the uri
         String workspaceName = location.split("/")[location.split("/").length - 1];

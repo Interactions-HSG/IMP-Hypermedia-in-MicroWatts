@@ -68,3 +68,15 @@ check rdf hdt first with cli tool to see if it is concise enough
 define mediatype for embedded devices that has stripped down tds ( signifier exposure mechanism )
 
 optimise with either restricting knowledge sent or binarized format of knowledge sent
+
+
+
+
+
+--------
+
+
+-> Group well formed
+
+-> Group no longer well formed
+    ->

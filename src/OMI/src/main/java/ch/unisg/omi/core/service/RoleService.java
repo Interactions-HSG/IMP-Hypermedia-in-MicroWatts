@@ -17,7 +17,7 @@ public class RoleService implements RoleUseCase {
     private Organization organization = Organization.getOrganization();
 
     @Override
-    public void adoptRole(RoleCommand command) {
+    public int adoptRole(RoleCommand command) {
 
         try {
 
@@ -31,8 +31,11 @@ public class RoleService implements RoleUseCase {
 
             organization.getOrgEntity().findGroup(command.getGroupId()).addPlayer(rolePlayer);
 
+            return 0;
+
         } catch (Exception e) {
             e.printStackTrace();
+            return 1;
         }
 
     }

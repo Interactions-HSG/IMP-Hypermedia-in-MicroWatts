@@ -5,6 +5,7 @@ services:
     container_name: omi
     environment:
       - ENTRYPOINT=http://yggdrasil:8080/
+      - BASE=http://omi:7500/
     ports:
       - "7500:7500/tcp"
       - "5686:5686/udp"

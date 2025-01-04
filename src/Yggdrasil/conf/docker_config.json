@@ -19,12 +19,6 @@
     "enabled" : true
   },
   "environment-config" : {
-    "known-artifacts" : [
-      {
-        "class" : "http://example.org/Counter",
-        "template" : "org.hyperagents.yggdrasil.cartago.artifacts.CounterTD"
-      }
-    ],
     "enabled" : true,
     "ontology" : "td",
     "workspaces" : [

@@ -14,4 +14,5 @@ public interface AgentPort {
     void notifyGoal(OEAgent agentId, Goal goal, String groupId, Mission mission, SchemeInstance scheme);
 
     void notifyGoal(List<Broadcaster.PlayerInfo> playerInfos);
+    void notifyGroup(OEAgent agent, String groupId);
 }

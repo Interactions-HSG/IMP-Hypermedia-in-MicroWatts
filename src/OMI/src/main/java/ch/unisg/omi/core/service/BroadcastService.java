@@ -16,11 +16,8 @@ public class BroadcastService implements BroadcastUseCase {
 
     @Override
     public void broadcast(String groupName) {
-        try {
-            broadcaster.send(groupName);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        broadcaster.setGroupName(groupName);
+        broadcaster.start();
     }
 
     @Async

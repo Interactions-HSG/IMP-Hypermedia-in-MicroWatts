@@ -1,6 +1,13 @@
 package ch.unisg.omi.controller.coap;
 
 import ch.unisg.omi.config.CoapServerConfig;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import java.lang.reflect.Type;
 import moise.os.ss.Role;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
@@ -34,9 +41,22 @@ public class RolesResource extends CoapResource implements ObservableResource {
      */
     @Override
     public void handleGET(CoapExchange exchange) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Role.class, new RoleSerializer());
+        Gson gson = gsonBuilder.create();
+        final var response = gson.toJson(this.roles);
 
-        Request request = exchange.advanced().getRequest();
+        exchange.respond(CoAP.ResponseCode.CONTENT,response);
+    }
 
-        exchange.respond(CoAP.ResponseCode.CONTENT, this.roles.toString());
+    private class RoleSerializer implements JsonSerializer<Role> {
+        @Override
+        public JsonElement serialize(Role role, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject jsonObject = new JsonObject();
+            // Add properties of the Role class to the JSON object
+            jsonObject.addProperty("name", role.getId());
+            // Add other properties as needed
+            return jsonObject;
+        }
     }
 }

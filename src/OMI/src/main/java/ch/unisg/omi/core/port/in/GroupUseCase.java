@@ -5,5 +5,6 @@ import moise.os.ss.Role;
 
 public interface GroupUseCase {
     public void addGroup(String groupName);
+    public void removeGroup(String groupName);
     public String getGroups();
 }

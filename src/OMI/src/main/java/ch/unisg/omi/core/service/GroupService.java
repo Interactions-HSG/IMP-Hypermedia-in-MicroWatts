@@ -4,6 +4,7 @@ import ch.unisg.omi.core.entity.Organization;
 import ch.unisg.omi.core.port.in.GroupUseCase;
 import ch.unisg.omi.core.port.out.GroupPort;
 import lombok.RequiredArgsConstructor;
+import moise.common.MoiseConsistencyException;
 import moise.oe.GroupInstance;
 import moise.os.CardinalitySet;
 import moise.os.ss.Role;
@@ -36,6 +37,18 @@ public class GroupService implements GroupUseCase {
         }
 
 
+    }
+
+    @Override
+    public void removeGroup(String groupName) {
+        try {
+            final var group = organization.getOrgEntity().findGroup(groupName);
+            final var players = group.getPlayers();
+            players.forEach(group::removePlayer);
+            organization.getOrgEntity().removeGroup(groupName);
+        } catch (MoiseConsistencyException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getGroups() {

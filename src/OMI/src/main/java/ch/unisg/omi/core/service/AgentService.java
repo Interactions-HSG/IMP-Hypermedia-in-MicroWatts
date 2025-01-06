@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import moise.common.MoiseConsistencyException;
 import moise.oe.OEAgent;
 import moise.oe.RolePlayer;
-import moise.os.ss.Role;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class AgentService implements AgentUseCase {
     }
 
     @Override
-    public void removeAgent(String agentName) {
+    public void removeAgent(String workspaceName, String agentName) {
         try {
             // Create a copy of the roles to avoid ConcurrentModificationException
             ArrayList<RolePlayer> roles =
@@ -69,5 +68,6 @@ public class AgentService implements AgentUseCase {
             System.out.println("[AgentService] Error:" + e);
             e.printStackTrace();
         }
+        agentPort.removeObserverRelation(agentName, workspaceName);
     }
 }

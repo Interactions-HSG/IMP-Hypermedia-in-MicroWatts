@@ -5,147 +5,141 @@ import ch.unisg.omi.core.service.MissionService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import moise.common.MoiseCardinalityException;
 import moise.common.MoiseConsistencyException;
 import moise.common.MoiseException;
-import moise.oe.GoalInstance;
-import moise.oe.MissionPlayer;
 import moise.oe.OEAgent;
 import moise.oe.RolePlayer;
 import moise.oe.SchemeInstance;
 import moise.os.fs.Goal;
 import moise.os.fs.Mission;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-import java.util.concurrent.CompletableFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Component
 @RequiredArgsConstructor
 public class Broadcaster extends Thread {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Broadcaster.class);
+
 
   private final Organization organization = Organization.getOrganization();
   private final AgentPort agentPort;
   private final MissionService mission;
   @Setter
   private String groupName;
+  private boolean finishedScheme;
+  private boolean wasWellFormed;
+  private boolean running;
 
+
+  public void shutdown() {
+    running = false;
+  }
+
+  private void handleWellFormed(final SchemeInstance schemeInstance) {
+    LOGGER.info("Group {} is well formed.", groupName);
+
+    try {
+      schemeInstance.addResponsibleGroup(groupName);
+    } catch (MoiseConsistencyException e) {
+      throw new RuntimeException(e);
+    }
+
+
+    final var playersMap = new HashMap<RolePlayer, List<PlayerInfo>>();
+
+    organization.getOrgEntity().findGroup(groupName).getPlayers().forEach((player) -> {
+      player.getPermissions().forEach(permission -> {
+        permission.getMission().getGoals().forEach(goal -> {
+          final var agentId = player.getPlayer();
+          final var missionId = permission.getMission();
+          final var schemeId = permission.getScheme();
+          playersMap.computeIfAbsent(player, (k) -> new ArrayList<>()).add(
+              new PlayerInfo(
+                  agentId,
+                  goal,
+                  groupName,
+                  missionId,
+                  schemeId
+              )
+          );
+          agentPort.sendGoal(player.getPlayer(), goal, groupName, permission.getMission(),
+              permission.getScheme());
+        });
+      });
+    });
+
+    playersMap.forEach((player, playerInfos)
+        -> agentPort.notifyGoal(playerInfos));
+  }
+
+  private void handleNoLongerWellFormed(final SchemeInstance schemeInstance) {
+    // TODO: Send Notifications to group members that group is no longer well formed
+    LOGGER.info("Group {} is no longer well formed.", groupName);
+    finishedScheme = false;
+
+    final var groupMembers = organization.getOrgEntity().findGroup(groupName).getPlayers();
+    groupMembers.forEach(gm -> agentPort.notifyGroup(gm.getPlayer(), groupName));
+
+    // need to stop and remove the scheme
+    SchemeInstance finalSchemeInstance = schemeInstance;
+    try {
+      final var players = new ArrayList<>(schemeInstance.getPlayers());
+      players.forEach(mp -> {
+        try {
+          mp.getPlayer().abortMission(mp.getMission().getId(),
+              finalSchemeInstance);
+        } catch (Exception e) {
+          LOGGER.error("Error aborting mission", e);
+          throw new RuntimeException(e);
+        }
+      });
+    } catch (Exception e) {
+      LOGGER.error("Error aborting mission", e);
+      throw new RuntimeException(e);
+    }
+
+    try {
+      schemeInstance.remResponsibleGroup(groupName);
+    } catch (MoiseConsistencyException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @Override
   public void run() {
-    System.out.println("[Broadcaster] Broadcaster: " + groupName);
+    Thread.currentThread().setName("Broadcaster-" + groupName);
 
-    boolean wasWellFormed = false; // Track the previous state of the group
-    boolean finishedScheme = false;
+    LOGGER.info("Started Broadcaster for: {}", groupName);
 
+    wasWellFormed = false;
+    finishedScheme = false;
+    running = true;
     SchemeInstance schemeInstance = null;
+
     try {
       schemeInstance = organization.getOrgEntity().startScheme("monitoring_scheme");
     } catch (MoiseException e) {
-      System.out.println("[Broadcaster] Error: " + e);
+      LOGGER.error("Error starting scheme", e);
     }
-    while (true) {
+
+    while (running) {
       boolean isWellFormed = organization.getOrgEntity().findGroup(groupName).isWellFormed();
 
       if (isWellFormed) {
         if (!wasWellFormed) { // Perform actions only on transition to well-formed
-          System.out.println("[Broadcaster] Group " + groupName + " is well formed.");
-
-          try {
-            schemeInstance.addResponsibleGroup(groupName);
-          } catch (MoiseConsistencyException e) {
-            throw new RuntimeException(e);
-          }
-
-
-          final var playersMap = new HashMap<RolePlayer, List<PlayerInfo>>();
-
-          organization.getOrgEntity().findGroup(groupName).getPlayers().forEach((player) -> {
-            player.getPermissions().forEach(permission -> {
-              permission.getMission().getGoals().forEach(goal -> {
-                final var agentId = player.getPlayer();
-                final var missionId = permission.getMission();
-                final var schemeId = permission.getScheme();
-                playersMap.computeIfAbsent(player, (k) -> new ArrayList<>()).add(
-                    new PlayerInfo(
-                        agentId,
-                        goal,
-                        groupName,
-                        missionId,
-                        schemeId
-                    )
-                );
-                agentPort.sendGoal(player.getPlayer(), goal, groupName, permission.getMission(),
-                    permission.getScheme());
-              });
-            });
-          });
-
-          playersMap.forEach((player, playerInfos)
-              -> agentPort.notifyGoal(playerInfos));
-          // Optionally finish the scheme later
-          // organization.getOrgEntity().finishScheme(schemeInstance);
-
+          handleWellFormed(schemeInstance);
         } else {
-          // Check if scheme is well-formed
           final var schemeWellFormed = schemeInstance.isWellFormed();
-          System.out.println("[Broadcaster] Schemes: " + organization.getOrgEntity().getSchemes().size());
-
-          System.out.println("[Broadcaster] Schemes: " + organization.getOrgEntity().getSchemes());
-          if (schemeWellFormed && !finishedScheme) {
-            final var g = schemeInstance.getRoot();
-
-            // schemeInstance.remResponsibleGroup(groupName);
-            // organization.getOrgEntity().finishScheme(schemeInstance);
-            // finishedScheme = true;
-
-          } else {
-            System.out.println("Log: Scheme is not well formed.");
-          }
+          LOGGER.info("Scheme is well formed: {}", schemeWellFormed);
         }
       } else {
         if (wasWellFormed) { // Perform actions only on transition to not well-formed
-          // TODO: Send Notifications to group members that group is no longer well formed
-          System.out.println("[Broadcaster1] Group " + groupName + " is no longer well formed.");
-          finishedScheme = false;
-
-          final var groupMembers = organization.getOrgEntity().findGroup(groupName).getPlayers();
-          groupMembers.forEach(gm -> agentPort.notifyGroup(gm.getPlayer(), groupName));
-
-          // need to stop and remove the scheme
-          SchemeInstance finalSchemeInstance = schemeInstance;
-          try {
-            final var players = new ArrayList<>(schemeInstance.getPlayers());
-            players.forEach(mp -> {
-              try {
-                mp.getPlayer().abortMission(mp.getMission().getId(),
-                    finalSchemeInstance);
-              } catch (MoiseException e) {
-                System.out.println("Error Moise: " + e);
-                throw new RuntimeException(e);
-              }
-              catch (Exception e) {
-                System.out.println("Error: " + e);
-                throw new RuntimeException(e);
-              }
-            });
-          } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-          }
-
-
-          try {
-            schemeInstance.remResponsibleGroup(groupName);
-          } catch (MoiseConsistencyException e) {
-            throw new RuntimeException(e);
-          }
+          handleNoLongerWellFormed(schemeInstance);
         }
 
         // Broadcast roles and group
-        System.out.println("Waiting for broadcast: " + groupName);
+        LOGGER.info("Broadcasting group and roles");
 
         Object[] roles =
             organization.getOrgEntity().findGroup(groupName).getGrSpec().getRoles().getAll()
@@ -170,7 +164,7 @@ public class Broadcaster extends Thread {
 
     }
 
-    System.out.println("Monitoring stopped.");
+    LOGGER.info("Stopped Broadcaster");
   }
 
   public record PlayerInfo(OEAgent player, Goal goal, String groupId, Mission mission,

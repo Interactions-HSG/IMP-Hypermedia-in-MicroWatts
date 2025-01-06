@@ -15,4 +15,6 @@ public interface AgentPort {
 
     void notifyGoal(List<Broadcaster.PlayerInfo> playerInfos);
     void notifyGroup(OEAgent agent, String groupId);
+
+    void removeObserverRelation(String agentId, String groupId);
 }

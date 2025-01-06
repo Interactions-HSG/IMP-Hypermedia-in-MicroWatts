@@ -19,7 +19,7 @@
     "enabled" : true
   },
   "environment-config" : {
-    "enabled" : true,
+    "enabled" : false,
     "ontology" : "td",
     "workspaces" : [
       {

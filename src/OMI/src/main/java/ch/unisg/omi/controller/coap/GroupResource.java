@@ -12,15 +12,22 @@ import com.google.gson.JsonObject;
 import lombok.Setter;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ObservableResource;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroupResource extends CoapResource implements ObservableResource {
 
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupResource.class);
+
     private ArrayList<HashMap<String, String>> goals = new ArrayList<>();
+
+    private final HashMap<String, ObserveRelation> observers;
 
     @Setter
     private boolean wellFormed;
@@ -44,20 +51,20 @@ public class GroupResource extends CoapResource implements ObservableResource {
     }
 
     public void notifyResource(final boolean groupWellFormed) {
-        System.out.println("Resource has changed - Sending Notification");
+        LOGGER.info("Resource has changed - Sending Notification");
         setWellFormed(groupWellFormed);
         this.changed();
-        //this.notifyObserverRelations(null);
     }
 
     public GroupResource(String name, GroupUseCase groupUseCase, RoleUseCase roleUseCase, MissionUseCase missionUseCase) {
         super(name, true);
         this.wellFormed = false;
-        System.out.println("[GroupResource] Resource created with name: " + name);
+        LOGGER.info("Resource created with name: {}", name);
         this.setObservable(true);
         this.groupUseCase = groupUseCase;
         this.roleUseCase = roleUseCase;
         this.missionUseCase = missionUseCase;
+        this.observers = new HashMap<>();
     }
 
   /*
@@ -65,7 +72,22 @@ public class GroupResource extends CoapResource implements ObservableResource {
      */
     @Override
     public void handleGET(CoapExchange exchange) {
-        System.out.println("[GroupResource] GET request received");
+        LOGGER.info("GET request received");
+        exchange.accept();
+
+        final var observeRelation = exchange.advanced().getRelation();
+
+        if (observeRelation == null) {
+            LOGGER.info("Observe relation is null");
+        } else {
+            LOGGER.info("Observe relation: {}", observeRelation);
+            final var agentId = exchange.getRequestText();
+            LOGGER.info("Agent ID: {}", agentId);
+            if (!observers.containsKey(agentId)) {
+                LOGGER.info("Adding observer relation for agent: {}", agentId);
+                observers.put(agentId, observeRelation);
+            }
+        }
 
         Gson gson = new Gson();
         JsonObject jsonResponse = new JsonObject();
@@ -77,7 +99,7 @@ public class GroupResource extends CoapResource implements ObservableResource {
             jsonResponse.addProperty("status","not well-formed");
             jsonResponse.add("goals", gson.toJsonTree(new ArrayList<>()));
         }
-        System.out.println("[GroupResource] Response: " + jsonResponse);
+        LOGGER.info("Response: {}", jsonResponse);
         exchange.respond(CoAP.ResponseCode.CONTENT, jsonResponse.toString());
     }
 
@@ -86,7 +108,7 @@ public class GroupResource extends CoapResource implements ObservableResource {
      */
     @Override
     public void handlePOST(CoapExchange exchange) {
-        System.out.println("[GroupResource] POST request received");
+        LOGGER.info("POST request received");
         try {
 
             Gson gson = new Gson();
@@ -98,18 +120,19 @@ public class GroupResource extends CoapResource implements ObservableResource {
                     roleDTO.getRoleId(),
                     roleDTO.getGroupId()
             );
+            LOGGER.info("Agent: {}, Role: {}, Group: {}", command.getAgentId(), command.getRoleId(), command.getGroupId());
 
             int res = roleUseCase.adoptRole(command);
 
             if (res == 1) {
-                System.out.println("[GroupResource] Role already occupied: " + roleDTO.getRoleId());
+                LOGGER.info("Role already occupied: {}", roleDTO.getRoleId());
                 exchange.respond(CoAP.ResponseCode.CONFLICT);
             } else {
-                System.out.println("[GroupResource] Sucessfully adopted Role: " + roleDTO.getRoleId());
+                LOGGER.info("Sucessfully adopted Role: {}", roleDTO.getRoleId());
                 exchange.respond(CoAP.ResponseCode.CREATED);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LOGGER.error("Error: {}", e.getMessage());
             exchange.respond(CoAP.ResponseCode.BAD_REQUEST);
         }
     }
@@ -119,7 +142,7 @@ public class GroupResource extends CoapResource implements ObservableResource {
      */
     @Override
     public void handlePUT(CoapExchange exchange) {
-        System.out.println("[GroupResource] PUT request received");
+        LOGGER.info("PUT request received");
         try {
 
             Gson gson = new Gson();
@@ -134,14 +157,23 @@ public class GroupResource extends CoapResource implements ObservableResource {
             );
 
 
-            System.out.println("[GroupResource] Mission command: " + command);
+            LOGGER.info("Mission command: {}", command);
             missionUseCase.commitMission(command);
 
             exchange.respond(CoAP.ResponseCode.CONTINUE);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LOGGER.error("Error: {}", e.getMessage());
             exchange.respond(CoAP.ResponseCode.BAD_REQUEST);
+        }
+    }
+
+    public void removeObserverRelation(String agentId) {
+        LOGGER.info("Removing observer relation for agent: {}", agentId);
+        final var relation = observers.get(agentId);
+        if (relation != null) {
+            this.removeObserveRelation(relation);
+            observers.remove(agentId);
         }
     }
 }

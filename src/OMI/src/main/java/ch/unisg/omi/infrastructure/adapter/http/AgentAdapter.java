@@ -5,7 +5,6 @@ import ch.unisg.ics.interactions.wot.td.affordances.ActionAffordance;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
-import ch.unisg.ics.interactions.wot.td.schemas.ArraySchema;
 import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
@@ -13,25 +12,22 @@ import ch.unisg.omi.config.CoapServerConfig;
 import ch.unisg.omi.controller.coap.GroupResource;
 import ch.unisg.omi.core.entity.Broadcaster;
 import ch.unisg.omi.core.port.out.AgentPort;
-import com.google.gson.Gson;
 import moise.oe.OEAgent;
 import moise.oe.SchemeInstance;
 import moise.os.fs.Goal;
 import moise.os.fs.Mission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.*;
 
 @Primary
 @Component
 public class AgentAdapter implements AgentPort {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AgentAdapter.class);
 
 
     private final CoapServerConfig server = CoapServerConfig.getInstance();
@@ -69,18 +65,17 @@ public class AgentAdapter implements AgentPort {
 
                     TDHttpResponse response = request.execute();
 
-                    System.out.println("Status code: " + response.getStatusCode());
+                    LOGGER.info("Status code: " + response.getStatusCode());
 
                 } else {
-
-                    System.out.println("Input schema not found.");
+                    LOGGER.info("Input schema not found.");
                 }
             } else {
-                System.out.println("Action not found.");
+                LOGGER.info("Action not found.");
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending group name", e);
         }
     }
 
@@ -117,16 +112,13 @@ public class AgentAdapter implements AgentPort {
 
                     TDHttpResponse response = request.execute();
 
-                    System.out.println("Status code: " + response.getStatusCode());
-
+                    LOGGER.info("Status code: " + response.getStatusCode());
                 } else {
-
-                    System.out.println("Input schema not found.");
+                    LOGGER.info("Input schema not found.");
                 }
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending roles", e);
         }
     }
 
@@ -162,18 +154,14 @@ public class AgentAdapter implements AgentPort {
 
                     TDHttpResponse response = request.execute();
 
-                    System.out.println("Status code: " + response.getStatusCode());
-
+                    LOGGER.info("Status code: " + response.getStatusCode());
                 } else {
-
-                    System.out.println("Input schema not found.");
+                    LOGGER.info("Input schema not found.");
                 }
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending goal", e);
         }
-
     }
 
     @Override
@@ -181,7 +169,7 @@ public class AgentAdapter implements AgentPort {
 
         var group = (GroupResource) server.getRoot().getChild(groupId);
 
-        System.out.println("Adapter: " + goal.getId() + mission.getId() + schemeInstance.getId());
+        LOGGER.info("notifyGoal: " + goal.getId() + mission.getId() + schemeInstance.getId());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("goalId", goal.getId());
@@ -211,8 +199,14 @@ public class AgentAdapter implements AgentPort {
 
     @Override
     public void notifyGroup(OEAgent agent, String groupId) {
-        System.out.println("[AgentAdapter] notifying Group Update");
+        LOGGER.info("notifyGroup: " + groupId);
         var group = (GroupResource) server.getRoot().getChild(groupId);
         group.notifyResource(false);
+    }
+
+    @Override
+    public void removeObserverRelation(String agentId, String groupId) {
+        var group = (GroupResource) server.getRoot().getChild(groupId);
+        group.removeObserverRelation(agentId);
     }
 }

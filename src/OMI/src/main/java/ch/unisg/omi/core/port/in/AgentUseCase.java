@@ -7,5 +7,5 @@ import java.util.List;
 public interface AgentUseCase {
     void addAgent(String agentId);
     List<OEAgent> getAgents();
-    void removeAgent(String agentName);
+    void removeAgent(String workspaceName, String agentName);
 }

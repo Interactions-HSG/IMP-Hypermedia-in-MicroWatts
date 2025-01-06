@@ -7,8 +7,8 @@ import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
+import ch.unisg.omi.controller.http.WorkspaceController;
 import com.google.gson.Gson;
-import lombok.Getter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,12 +19,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 public class YggdrasilConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(YggdrasilConfig.class);
 
     private static Environment env;
 
@@ -67,7 +68,7 @@ public class YggdrasilConfig {
 
                 TDHttpResponse responseArtifact = requestArtifact.execute();
 
-                System.out.println("Status code: " + responseArtifact.getStatusCode());
+                LOGGER.info("Initialization Status code: " + responseArtifact.getStatusCode());
             }
 
         } catch (IOException ioException) {
@@ -88,7 +89,7 @@ public class YggdrasilConfig {
      */
     public void subscribe(String topic, String callback) {
 
-        HashMap map = new HashMap<>();
+        HashMap<String, String> map = new HashMap<>();
         map.put("hub.topic", topic);
         map.put("hub.callback", callback);
         map.put("hub.mode", "subscribe");
@@ -102,12 +103,12 @@ public class YggdrasilConfig {
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
-            HttpResponse response = HttpClient
+            HttpResponse<String> response = HttpClient
                     .newBuilder()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("Status code: " + response.statusCode());
+            LOGGER.info("Subscribe Status code: " + response.statusCode());
 
         } catch (Exception e) {
             e.printStackTrace();

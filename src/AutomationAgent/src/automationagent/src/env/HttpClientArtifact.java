@@ -1,9 +1,5 @@
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import static org.eclipse.rdf4j.model.util.Values.iri;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -11,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.checkerframework.checker.units.qual.s;
 import org.eclipse.rdf4j.model.Value;
 
 import cartago.Artifact;
@@ -23,12 +20,9 @@ import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
-import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
-import jason.stdlib.sort;
-
-import static org.eclipse.rdf4j.model.util.Values.iri;
+import jade.content.schema.ObjectSchema;
 
 
 public class HttpClientArtifact extends Artifact{
@@ -40,16 +34,25 @@ public class HttpClientArtifact extends Artifact{
 
     void init(){}
 
-    /* Get a list of all workspaces
-     * 
+    /* The getWorkspaces function retrieves a set of workspaces from a graph representation of a Thing Description (TD) associated with yggdrasil.
+     * The return value is an optional data structure containing workspaces URIs if successfully retrieved. 
+     * Otherwise, the function returns an empty optional if an exception occurs during the process.
      */
     public Optional<Set<Value>> getWorkspaces() {
+
+        System.out.println("Log: Find all workspaces in yggdrasil");
+
         // Create a new set with workspaces
         Set<Value> workspaces;
 
         try {
+
+            System.out.println("Log: Read the ThingDescription of yggdrasil");
+
              // Get and parse the TD from the entrypoint
             ThingDescription td = TDGraphReader.readFromURL(TDFormat.RDF_TURTLE, ENTRYPOINT);
+
+            System.out.println("Log: Process the information from the graph to find all workspaces");
 
              // Get the graph
             final var model = td.getGraph().get();
@@ -60,6 +63,8 @@ public class HttpClientArtifact extends Artifact{
             // Get all workspace uris
             workspaces = filtered.objects();
 
+            System.out.println("Log: This workspaces were found: " + workspaces);
+
             return Optional.of(workspaces);
 
         } catch (Exception e) {
@@ -68,66 +73,139 @@ public class HttpClientArtifact extends Artifact{
         }
     }
     
-    /*
-     * 
+    /* Create an artifact in the specified workspace by invoking the "createArtifact" action.
+     *
      */
     public void createArtifact(String workspace) {
         
+        System.out.println("Log: Create a body artifact to interact with the Automation Agent");
+
         try {
+
+            System.out.println("Log: Read the ThingDescription of a specified workspace");
             
+            // Get and parse the TD from a workspace
             ThingDescription td = TDGraphReader.readFromURL(TDFormat.RDF_TURTLE, workspace);
 
+            System.out.println("Log: Find action by name");
+
+            // Find action by name 
             Optional<ActionAffordance> action = td.getActionByName("createArtifact");
 
+            // Check if the action is present in the Thing Description
             if (action.isPresent()) {
 
+                System.out.println("Log: Action found");
+
+                // Create a request to execute the action with the first available form
                 TDHttpRequest request = new TDHttpRequest(action.get().getFirstForm().orElseThrow(), TD.invokeAction);
 
                 request.addHeader("Slug", "AutomationAgent");
                 request.addHeader("X-Agent-WebID", WEBID);
                 
+                // Read metadata of the Automation Agent
                 final var metadata = Files.readString(Path.of("resources/metadata.ttl"));
     
                 StringSchema schema = new StringSchema.Builder().build();
      
+                System.out.println("Log: Set payload");
+
+                // Add metadata to the request payload
                 request.setPrimitivePayload(schema, metadata);
 
-                System.out.println(request);
+                System.out.println("Log: Execute action");
+
                 TDHttpResponse response = request.execute();
 
-                System.out.println("Status code: " + response.getStatusCode());
+                if (response.response.getStatusCode() == 201) {
+                    System.out.println("Log: Action was successfully executed");
+                } else {
+                    System.out.println("Error: Action was not executed");
+                }
 
+            } else {
+                System.out.println("Log: Action not found");
             }
 
         } catch (Exception e) {
-            System.out.println("ERROR!");
-            // TODO: handle exception
+            e.printStackTrace();
         }
         
     }
 
-    /* Join a specific workspace
-     * Operation receives a workspace name
+    /* Destroy an artifact in the specified workspace by invoking the "destroyArtifact" action.
+     * 
+     */
+    public void destroyArtifact(String workspaceName) {
+
+        System.out.println("Log: destroy artifact");
+
+        try {
+
+            // Read the Thing Description (TD) from the specified workspace name
+            ThingDescription td = TDGraphReader.readFromURL(TDFormat.RDF_TURTLE, workspace);
+
+            // Retrieve the "destroyArtifact" action from the TD, if it exists
+            Optional<ActionAffordance> action = td.getActionByName("destroyArtifact");
+
+            // Check if the action is present in the Thing Description
+            if (action.isPresent()) {
+
+                System.out.println("Log: Action found");
+                
+                // Create a request to execute the action using the first available form
+                TDHttpRequest request = new TDHttpRequest(action.get().getFirstForm().orElseThrow(), TD.invokeAction);
+
+                // Add necessary headers to the request
+                request.addHeader("Slug", "AutomationAgent");
+                request.addHeader("X-Agent-WebID", WEBID);
+                
+                System.out.println("Log: Execute action");
+
+                // Execute the request and get the response
+                TDHttpResponse response = request.execute();
+
+                if (response.response.getStatusCode() == 201) {
+                    System.out.println("Log: Action was successfully executed");
+                } else {
+                    System.out.println("Error: Action was not executed");
+                }
+            }
+
+        } catch (Exception e) {
+            // Print the stack trace if any exception occurs
+            e.printStackTrace();
+        }
+    }
+
+    
+    /* The operation receives a workspace name, searches for the corresponding workspace URI, 
+     * and attempts to join it by creating an artifact.
+     * The success of the operation is returned as feedback.
      */
     @OPERATION
-    public void joinYggdrasil(final String workspaceName, OpFeedbackParam<Boolean> success) {
+    public void joinRoom(final String workspaceName, OpFeedbackParam<Boolean> success) {
     
-        // Get all workspace uris
+        System.out.println("Log: Join room " + workspaceName);
+
+        // Retrieve all workspace URIs
         Optional<Set<Value>> workspaces = getWorkspaces();
 
+        // Check if workspaces are available
         if (workspaces.isPresent()) {
 
-            // Loop through each workspace
+            System.out.println("Log: Workspaces " + workspaces + "are found");
+
+            // Loop through each workspace URI
             workspaces.get().forEach((workspace) -> {
                 
-                // If a workspace contains the room within the uri ...
+                // Check if the workspace URI contains the specified workspace name
                 if (workspace.toString().contains(workspaceName.replace("'", ""))) {
                     
+                    // Create an artifact for the specified workspace
                     createArtifact(workspace.stringValue());
-
-                    // Get Formular to join the workspace, and do it!
-                    // Join the workspace
-                    System.out.println(workspace);
+                    
+                    System.out.println("Log: Body artifact is created");
                 }
             });
 
@@ -138,234 +216,177 @@ public class HttpClientArtifact extends Artifact{
         }
     }
 
-    /*
-     * 
+    /* The operation receives a workspace name, searches for the corresponding workspace URI, 
+     * and attempts to leave it by creating an artifact.
+     * The success of the operation is returned as feedback.
+     */
+    @OPERATION
+    public void leaveRoom(final String workspaceName, OpFeedbackParam<Boolean> success) {
+
+        System.out.println("Log: Leave room " + workspaceName);
+
+        // Retrieve all workspace URIs
+        Optional<Set<Value>> workspaces = getWorkspaces();
+
+        // Check if workspaces are available
+        if (workspaces.isPresent()) {
+
+            System.out.println("Log: Workspaces " + workspaces + "are found");
+            
+            // Loop through each workspace URI
+            workspaces.get().forEach((workspace) -> {
+                
+                if (workspace.toString().contains(workspaceName.replace("'", ""))) {
+                    
+                    destroyArtifact(workspace.stringValue());
+
+                    System.out.println("Log: Body artifact is destroyed");
+                }
+
+            });
+
+            // Return to the agent that the leaving of the workspace was successful
+            success.set(true);
+        } else {
+            success.set(false);
+        }
+
+    }
+
+    /* The operation takes a role ID and a group ID, and attempts to adopt the role 
+     * by invoking the "adoptRole" action on a Thing Description (TD). 
+     * The success of the operation is returned as feedback.
      */
     @OPERATION
     public void adoptRole(String roleId, String groupId, OpFeedbackParam<Boolean> success) {
         
         try {
+            // Retrieve the Thing Description (TD) for the specified OMI
             ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, OMI);
 
+            // Retrieve the "adoptRole" action from the TD
             Optional<ActionAffordance> action = td.getActionByName("adoptRole");
 
+            // Check if the action is present
             if (action.isPresent()) {
+
+                // Create a request for the action using the first available form
                 TDHttpRequest request = new TDHttpRequest (
                     action.get().getFirstFormForSubProtocol(TD.invokeAction, "http").orElseThrow(),
                     TD.invokeAction
                 );
-
+                
+                // Add necessary headers to the request
                 request.addHeader("Slug", SLUG);
                 request.addHeader("X-Agent-WebID", WEBID);
 
+                // Retrieve the input schema for the action
                 Optional<DataSchema> inputSchema = action.get().getInputSchema();
 
+                // If the input schema is present, construct and send the payload
                 if (inputSchema.isPresent()) {
                     Map<String, Object> payload = new HashMap<>();
                     payload.put("agentId", WEBID);
                     payload.put("groupId", groupId);
                     payload.put("roleId", roleId);
 
+                    // Set the payload according to the input schema
                     request.setObjectPayload((ObjectSchema) inputSchema.get(), payload);
+
+                    // Execute the request
                     TDHttpResponse response = request.execute();
 
-                    System.out.println("Status code: " + response.getStatusCode());
+                    if (response.response.getStatusCode() == 201) {
+                        System.out.println("Log: Action was successfully executed");
+                    } else {
+                        System.out.println("Error: Action was not executed");
+
+                        success.set(false);
+                    }
+
                 } else {
-                    System.out.println("Input schema not found.");
+                    System.out.println("Input schema not found");
+                    success.set(false);
                 }
 
             } else {
-                System.out.println("Action not found.");
+                System.out.println("Action not found");
+                success.set(false);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            success.set(false);
         }
-       // TODO: 
-
-
-    
         success.set(true);
     }
-@OPERATION
-public void commitToMission(String missionId, String schemeId, String goalId, OpFeedbackParam<Boolean> success) {
-    try {
-        ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, OMI);
 
-        Optional<ActionAffordance> action = td.getActionByName("commitToMission");
+    /* Commit to a specific mission
+     * The operation takes a mission ID, scheme ID, and goal ID, and attempts to commit 
+     * to the mission by invoking the "commitToMission" action on a Thing Description (TD). 
+     * The success of the operation is returned as feedback.
+     */
+    @OPERATION
+    public void commitToMission(String missionId, String schemeId, String goalId, OpFeedbackParam<Boolean> success) {
+        try {
+            // Retrieve the Thing Description (TD) for the specified OMI
+            ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, OMI);
 
-        if (action.isPresent()) {
-            TDHttpRequest request = new TDHttpRequest(
-                action.get().getFirstFormForSubProtocol(TD.invokeAction, "http").orElseThrow(),
-                TD.invokeAction
-            );
+            // Retrieve the "commitToMission" action from the TD
+            Optional<ActionAffordance> action = td.getActionByName("commitToMission");
 
-            request.addHeader("Slug", SLUG);
-            request.addHeader("X-Agent-WebID", WEBID);
+            // Check if the action is present
+            if (action.isPresent()) {
 
-            Optional<DataSchema> inputScheme = action.get().getInputSchema();
+                // Create a request for the action using the first available form
+                TDHttpRequest request = new TDHttpRequest(
+                    action.get().getFirstFormForSubProtocol(TD.invokeAction, "http").orElseThrow(),
+                    TD.invokeAction
+                );
 
-            if (inputScheme.isPresent()) {
-                Map<String, Object> payload = new HashMap<>();
+                // Add necessary headers to the request
+                request.addHeader("Slug", SLUG);
+                request.addHeader("X-Agent-WebID", WEBID);
 
-                payload.put("agentId", WEBID);
-                payload.put("missionId", missionId);
-                payload.put("schemeId", schemeId);
-                payload.put("goalId", goalId);
+                // Retrieve the input schema for the action
+                Optional<DataSchema> inputScheme = action.get().getInputSchema();
 
-                request.setObjectPayload((ObjectSchema) inputScheme.get(), payload);
-                TDHttpResponse response = request.execute();
+                // If the input schema is present, construct and send the payload
+                if (inputScheme.isPresent()) {
+                    Map<String, Object> payload = new HashMap<>();
 
-                System.out.println("Status code: " + response.getStatusCode());
-                
+                    payload.put("agentId", WEBID);
+                    payload.put("missionId", missionId);
+                    payload.put("schemeId", schemeId);
+                    payload.put("goalId", goalId);
+
+                    // Set the payload
+                    request.setObjectPayload((ObjectSchema) inputScheme.get(), payload);
+
+                    // Execute the request
+                    TDHttpResponse response = request.execute();
+
+                    if (response.response.getStatusCode() == 201) {
+                        System.out.println("Log: Commitment to mission was successful");
+                    } else {
+                        System.out.println("Log: Commitment to mission was not successful");
+
+                        success.set(false);
+                    }
+                    
+                } else {
+                    success.set(false);
+                    System.out.println("Input scheme not found.");
+                }
+
             } else {
-                System.out.println("Input scheme not found.");
+
+                sucess.set(false);
+                System.out.println("Action not found.");
             }
 
-        } else {
-            System.out.println("Action not found.");
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-
-
-    /* 
-     * 
-     */
-    public String readEndpoint(String urir) {
-        try {
-            URI uri = new URI(urir);
-
-            HttpRequest request = HttpRequest.newBuilder()
-            .uri(uri)
-            .GET()
-            .build();
-
-            HttpClient client = HttpClient.newHttpClient();
-            try {
-                System.out.println(request.toString());
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() != 200) {
-                    System.out.println("Error: " + response.statusCode());
-                }
-                String responseBody = response.body();
-                return responseBody;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
-    }
-
-    /*
-     * 
-     */
-    @OPERATION
-    public void readEndpoint(String resourceUri, OpFeedbackParam<String> result) {
-        try {
-            URI uri = new URI(resourceUri);
-
-            HttpRequest request = HttpRequest.newBuilder()
-            .uri(uri)
-            .GET()
-            .build();
-
-            HttpClient client = HttpClient.newHttpClient();
-            try {
-                System.out.println(request.toString());
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() != 200) {
-                    System.out.println("Error: " + response.statusCode());
-                }
-                String responseBody = response.body();
-                result.set(responseBody);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    /*
-     * 
-     */
-    @OPERATION
-    public void getEntrypoint(final String uri, OpFeedbackParam<String> representation, OpFeedbackParam<Boolean> success) {
-        final String result = readEndpoint(uri);
-        if (result == null) {
-            success.set(false);
-        } else {
-            success.set(true);
-            representation.set(result);
-        }
-
-    }
-
-    /*
-     * 
-     */
-    @OPERATION
-    public void getWorkspace(String workspaceName, String entrypointTDString,OpFeedbackParam<Boolean> found, OpFeedbackParam<String> result) {
-        ThingDescription td = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, entrypointTDString);
-        final var expectedWorkspaceURI = ENTRYPOINT + "workspaces/" + workspaceName +"/#workspace";
-        final var foundWorkspace = findWorkspace(td, workspaceName, expectedWorkspaceURI);
-        found.set(foundWorkspace);
-        result.set(cleanUri(expectedWorkspaceURI));
-
-    }
-
-    /*
-     * 
-     */
-    public boolean findWorkspace(ThingDescription td, final String workspaceName, final String expectedWorkspaceURI) {
-        final var model = td.getGraph().get();
-        final var t = model.filter(null, iri("https://purl.org/hmas/hosts"), iri(expectedWorkspaceURI));
-        return t.size() > 0;
-    }
-
-    /*
-     * 
-     */
-    @OPERATION
-    public void findOrganisationInWorkspace(final String workspaceRepresenation, OpFeedbackParam<Boolean> found,
-                                            OpFeedbackParam<String> orgArtifactUri){
-        final var model = TDGraphReader.readFromString(TDFormat.RDF_TURTLE, workspaceRepresenation).getGraph().get();
-        final var artifactsInWorkspace = model.filter(null, iri("https://purl.org/hmas/contains"),null);
-        if (artifactsInWorkspace.isEmpty()) {
-           System.out.println("No org artifact present");
-           found.set(false);
-           return;
-        }
-        final var uncleanedArtifactUri = artifactsInWorkspace.stream().findFirst().get().getObject().toString();
-        orgArtifactUri.set(cleanUri(uncleanedArtifactUri));
-        found.set(true);
-    }
-
-    /*
-     * 
-     */
-    private String cleanUri(final String ucleanUri){
-        return ucleanUri.replaceAll("/#[^/]*$", "");
-    }
-
-    /*
-     * 
-     */
-    @OPERATION
-    public void joinOrganisation(final String orgArtifactRepresentation, OpFeedbackParam<Boolean> success){
-        System.out.println(orgArtifactRepresentation);
     }
 
 }

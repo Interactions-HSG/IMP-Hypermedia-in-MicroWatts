@@ -20,7 +20,7 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 2. Enter the workspace Room
  *
  */
-+get_temperature(Room)[source(User)] : true <-
++get_telemetry(Room)[source(User)] : true <-
     .print("Log: Measure the temperature in ", Room, ".");
     !joinWorkspace(Room);
     !adoptRole.
@@ -28,7 +28,7 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 /* Receiving belief from a user to stop determining the temperature of a room.
  *
  */
--get_temperature(Room)[source(User)] : true <-
+-get_telemetry(Room)[source(User)] : true <-
     .print("Log: Stop the temperature measurement in ", Room, ".");
     !leaveWorkspace(Room).
 
@@ -63,13 +63,14 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
  */
 +!joinWorkspace(Room) : true <-
     .print("Join workspace ", Room,".");
-    joinYggdrasil(Room, Success).
+    joinRoom(Room, Success).
 
 /* Plan for leaving a workspace
  *
  */
 +!leaveWorkspace(Room) : true <-
-    .print("Leave workspace ", Room, ".").
+    .print("Leave workspace ", Room, ".");
+    leaveRoom(Room, Success).
 
 +!adoptRole : hasRole(Role) & group(GroupId) <-
     adoptRole(Role, GroupId, Success);
@@ -84,53 +85,6 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
     .print(Mission, Scheme);
     commitToMission(Mission, Scheme, "automate_telemetry", Success);
     .print("It works.").
-/*
-// Currently hardcoded EntryURI will be used
-+!findHyperMediaEnvironment : entrypoint(URI) <- 
-       .print("Finding organisation");
-       getEntrypoint(URI, EntrypointRepresentation, Success);
-       !entrypointFound(EntrypointRepresentation, Success).
-
-
-+!entrypointFound(EntrypointRepresentation, Success) : Success == true <-
-       .print("Found entrypoint, checking out root workspace");
-       getWorkspace("root",EntrypointRepresentation, FoundWorkspace ,RootWorkspaceUri);    // Returns true / false and the URI to the rootWorkspace
-       !workspaceFound(FoundWorkspace, RootWorkspaceUri).
-       
-+!entrypointFound(EntrypointRepresentation, Success) : Success == false <-
-       .print("Could not find entrypoint, trying again next cycle.");
-       .random([10000,20000,50000],X);
-       .wait(X);
-       !findHyperMediaEnvironment.
-
-*/
-
-// Plan for if we do not find the root uri 
-+!workspaceFound(FoundWorkspace, RootWorkspaceUri) : FoundWorkspace == false <-
-       .print("Could not find root workspace, trying again next cycle.");
-       .random([10000,20000,50000],X);
-       .wait(X);
-       !findHyperMediaEnvironment. 
-
-// If we find a URI for a root workspace plan
-+!workspaceFound(FoundWorkspace, RootWorkspaceUri) : FoundWorkspace == true <-
-       .print("Found root workspace, joining Organisation");
-       readEndpoint(RootWorkspaceUri, RootWorkspaceRepresentation);                 // get the TD representation of root workspace
-       findOrganisationInWorkspace(RootWorkspaceRepresentation, FoundOrg, OrgArtifactUri);          // try to get the URI of the Org Artifact
-       !organisationFound(FoundOrg, OrgArtifactUri, RootWorkspaceUri).
-
-// plan for if we do not find the org artifact uri
-+!organisationFound(FoundOrg, OrgArtifactUri, RootWorkspaceUri) : FoundOrg == false <-
-       .print("Could not find organisation, trying again nect cycle.");
-       .random([10000,20000,50000],X);
-       .wait(X);
-       !workspaceFound(true, RootWorkspaceUri).
-                                              
-// plan of we do get the org artifact uri
-+!organisationFound(FoundOrg, OrgArtifactUri, RootWorkspaceUri) : FoundOrg == true <-
-       .print("Found Organisation Artifact, trying to join Organisation.");
-       readEndpoint(OrgArtifactUri, OrgRepresentation);
-       joinOrganisation(OrgRepresentation,Success).
 
 { include("$jacamo/templates/common-cartago.asl") }
 { include("$jacamo/templates/common-moise.asl") }

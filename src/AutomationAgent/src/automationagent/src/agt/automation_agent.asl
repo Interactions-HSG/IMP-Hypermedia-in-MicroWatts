@@ -28,7 +28,7 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 /* Receiving belief from a user to stop determining the temperature of a room.
  *
  */
--get_telemetry(Room)[source(User)] : true <-
++stop_telemetry(Room)[source(User)] : true <-
     .print("Log: Stop the temperature measurement in ", Room, ".");
     !leaveWorkspace(Room).
 

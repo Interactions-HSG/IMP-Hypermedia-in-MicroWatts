@@ -31,6 +31,7 @@ public class HttpClientArtifact extends Artifact{
     private static String ENTRYPOINT = "http://yggdrasil:8080/";
     private static String WEBID = "http://yggdrasil:8080/workspaces/room1/artifacts/AutomationAgent";
     private static String OMI = "http://yggdrasil:8080/workspaces/root/artifacts/omi";
+    private static String DB = "http://yggdrasil:8080/workspaces/root/artifacts/datalake";
 
     void init(){}
 
@@ -380,7 +381,50 @@ public class HttpClientArtifact extends Artifact{
 
             } else {
 
-                sucess.set(false);
+                success.set(false);
+                System.out.println("Action not found.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+     */
+    @OPERATION
+    public void getSensorData(String type, OpFeedbackParam<String> response, OpFeedbackParam<Boolean> success) {
+        try {
+            // Retrieve the Thing Description (TD) for the specified OMI
+            ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, DB);
+
+            // Retrieve the "commitToMission" action from the TD
+            Optional<ActionAffordance> action = td.getActionByName("get" + type);
+
+            // Check if the action is present
+            if (action.isPresent()) {
+
+                // Create a request for the action using the first available form
+                TDHttpRequest request = new TDHttpRequest(
+                    action.get().getFirstFormForSubProtocol(TD.invokeAction, "http").orElseThrow(),
+                    TD.invokeAction
+                );
+
+                // Add necessary headers to the request
+                request.addHeader("Slug", SLUG);
+                request.addHeader("X-Agent-WebID", WEBID);
+
+                // Retrieve the input schema for the action
+                Optional<DataSchema> inputScheme = action.get().getInputSchema();
+
+                // Execute the request
+                TDHttpResponse response = request.execute();
+                success.set(true);
+                success.set(response.getPayload());
+
+            } else {
+
+                success.set(false);
                 System.out.println("Action not found.");
             }
 

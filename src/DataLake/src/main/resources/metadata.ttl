@@ -28,5 +28,19 @@
                 js:propertyName "sensorId"
             ];
         ];
-    ];
+    ], [ a td:ActionAffordance;
+        td:name "getTemperature";
+        td:hasForm [
+            htv:methodName "GET" ;
+            hctl:hasTarget <http://datalake:7600/temperature> ;
+            hctl:hasOperationType td:invokeAction
+        ];
+    ], [ a td:ActionAffordance;
+        td:name "getHumidity";
+        td:hasForm [
+            htv:methodName "GET" ;
+            hctl:hasTarget <http://datalake:7600/humidity> ;
+            hctl:hasOperationType td:invokeAction
+        ] ;
+    ] ;
 .

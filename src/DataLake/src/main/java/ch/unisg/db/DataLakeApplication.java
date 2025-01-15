@@ -2,8 +2,7 @@ package ch.unisg.db;
 
 import ch.unisg.db.config.DBServer;
 import ch.unisg.db.config.Yggdrasil;
-import ch.unisg.db.controllers.TelemetryController;
-import java.util.HashMap;
+import ch.unisg.db.controllers.TemperatureResource;
 import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.TcpConfig;
 import org.eclipse.californium.elements.config.UdpConfig;
@@ -39,7 +38,7 @@ public class DataLakeApplication {
         int port = 5685;
         DBServer server = new DBServer(udp, tcp, port);
 
-        server.add(new TelemetryController("data"));
+        server.add(new TemperatureResource("data"));
 
         server.start();
         System.out.println("Server started");

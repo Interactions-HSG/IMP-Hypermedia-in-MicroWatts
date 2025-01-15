@@ -2,7 +2,7 @@ package ch.unisg.db.db;
 
 import java.util.HashMap;
 
-public class Database {
+public class Database implements dbUseCase {
   private static Database instance;
   private final HashMap<String, String> data;
 

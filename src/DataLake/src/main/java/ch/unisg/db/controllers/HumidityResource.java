@@ -4,27 +4,20 @@ import ch.unisg.db.db.Database;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-public class TelemetryController extends CoapResource {
-
+public class HumidityResource extends CoapResource {
     private final Database database = Database.getInstance();
 
-    public TelemetryController(String uri) {
+    public HumidityResource(String uri) {
         super(uri);
         setObservable(true);
-        getAttributes().setTitle("data");
+        getAttributes().setTitle("humidity");
     }
 
     @Override
     public void handleGET(CoapExchange exchange) {
         exchange.accept();
-        final var telemetries = database.getAll();
-        exchange.respond(telemetries.toString());
+        final String humidity = database.get("humidity");
+        exchange.respond(humidity);
     }
 
     @Override

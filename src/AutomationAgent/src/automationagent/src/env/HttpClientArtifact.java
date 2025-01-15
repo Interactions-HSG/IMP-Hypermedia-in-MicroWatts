@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.checkerframework.checker.units.qual.s;
 import org.eclipse.rdf4j.model.Value;
 
 import cartago.Artifact;
@@ -20,9 +19,9 @@ import ch.unisg.ics.interactions.wot.td.clients.TDHttpRequest;
 import ch.unisg.ics.interactions.wot.td.clients.TDHttpResponse;
 import ch.unisg.ics.interactions.wot.td.io.TDGraphReader;
 import ch.unisg.ics.interactions.wot.td.schemas.DataSchema;
+import ch.unisg.ics.interactions.wot.td.schemas.ObjectSchema;
 import ch.unisg.ics.interactions.wot.td.schemas.StringSchema;
 import ch.unisg.ics.interactions.wot.td.vocabularies.TD;
-import jade.content.schema.ObjectSchema;
 
 
 public class HttpClientArtifact extends Artifact{
@@ -117,7 +116,7 @@ public class HttpClientArtifact extends Artifact{
 
                 TDHttpResponse response = request.execute();
 
-                if (response.response.getStatusCode() == 201) {
+                if (response.getStatusCode() == 201) {
                     System.out.println("Log: Action was successfully executed");
                 } else {
                     System.out.println("Error: Action was not executed");
@@ -143,7 +142,7 @@ public class HttpClientArtifact extends Artifact{
         try {
 
             // Read the Thing Description (TD) from the specified workspace name
-            ThingDescription td = TDGraphReader.readFromURL(TDFormat.RDF_TURTLE, workspace);
+            ThingDescription td = TDGraphReader.readFromURL(TDFormat.RDF_TURTLE, workspaceName);
 
             // Retrieve the "destroyArtifact" action from the TD, if it exists
             Optional<ActionAffordance> action = td.getActionByName("destroyArtifact");
@@ -165,7 +164,7 @@ public class HttpClientArtifact extends Artifact{
                 // Execute the request and get the response
                 TDHttpResponse response = request.execute();
 
-                if (response.response.getStatusCode() == 201) {
+                if (response.getStatusCode() == 201) {
                     System.out.println("Log: Action was successfully executed");
                 } else {
                     System.out.println("Error: Action was not executed");
@@ -296,7 +295,7 @@ public class HttpClientArtifact extends Artifact{
                     // Execute the request
                     TDHttpResponse response = request.execute();
 
-                    if (response.response.getStatusCode() == 201) {
+                    if (response.getStatusCode() == 201) {
                         System.out.println("Log: Action was successfully executed");
                     } else {
                         System.out.println("Error: Action was not executed");
@@ -365,7 +364,7 @@ public class HttpClientArtifact extends Artifact{
                     // Execute the request
                     TDHttpResponse response = request.execute();
 
-                    if (response.response.getStatusCode() == 201) {
+                    if (response.getStatusCode() == 201) {
                         System.out.println("Log: Commitment to mission was successful");
                     } else {
                         System.out.println("Log: Commitment to mission was not successful");
@@ -380,7 +379,7 @@ public class HttpClientArtifact extends Artifact{
 
             } else {
 
-                sucess.set(false);
+                success.set(false);
                 System.out.println("Action not found.");
             }
 

@@ -74,12 +74,13 @@ public class Broadcaster extends Thread {
   }
 
   private void handleNoLongerWellFormed(final SchemeInstance schemeInstance) {
-    // TODO: Send Notifications to group members that group is no longer well formed
     LOGGER.info("Group {} is no longer well formed.", groupName);
     finishedScheme = false;
 
     final var groupMembers = organization.getOrgEntity().findGroup(groupName).getPlayers();
-    groupMembers.forEach(gm -> agentPort.notifyGroup(gm.getPlayer(), groupName));
+    groupMembers.forEach((gm) -> {
+      agentPort.notifyGroup(gm.getPlayer(), groupName);
+    });
 
     // need to stop and remove the scheme
     SchemeInstance finalSchemeInstance = schemeInstance;

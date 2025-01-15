@@ -3,6 +3,8 @@ role(automation_agent).
 
 hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 
+groupWellFormed(false).
+
 /* Initial goals */
 
 !start.
@@ -35,16 +37,20 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 /* Receiving belief from the OMI to join a group
  * 
  */
-+group(GroupName)[source(OMI)] : true <- 
-    .print("Log: New group ", GroupName, " received from ", OMI, ".").
++group(GroupName)[source(Sender)] : true <- 
+    .print("Log: New group ", GroupName, " received from ", Sender, ".").
     
 
 /* Receiving belief from the OMI to exit a group
  *
  */
--group(GroupName)[source(OMI)] : true <-
-    .print("Log: Leave group ", GroupName, " received from ", OMI, ".");
+-group(GroupName)[source(Sender)] : true <-
+    .print("Log: Leave group ", GroupName, " received from ", Sender, ".");
     !leaveOmiGroup(GroupName).
+
+
++notifyGroup(IsWellFormed)[source(Sender)] : true <-
+    .print("AA is notified").
 
 /*
  *

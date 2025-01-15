@@ -11,10 +11,7 @@ public interface AgentPort {
     void sendGroupName(String agentId, String groupName);
     void sendRoles(String agentId, Object[] roles);
     void sendGoal(OEAgent agentId, Goal goal, String groupId, Mission mission, SchemeInstance scheme);
-    void notifyGoal(OEAgent agentId, Goal goal, String groupId, Mission mission, SchemeInstance scheme);
-
     void notifyGoal(List<Broadcaster.PlayerInfo> playerInfos);
     void notifyGroup(OEAgent agent, String groupId);
-
     void removeObserverRelation(String agentId, String groupId);
 }

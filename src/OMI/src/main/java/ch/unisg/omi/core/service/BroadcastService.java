@@ -4,12 +4,9 @@ import ch.unisg.omi.core.entity.Broadcaster;
 import ch.unisg.omi.core.port.in.BroadcastUseCase;
 import ch.unisg.omi.core.port.out.AgentPort;
 import java.util.HashMap;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Service("Broadcast")

@@ -3,7 +3,7 @@ role(automation_agent).
 
 hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 
-// groupWellFormed(false).
+groupWellFormed(false).
 
 /* Initial goals */
 
@@ -26,15 +26,19 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
     .print("Log: Retrieve the temperature in ", Room, ".");
     !joinWorkspace(Room);
     !adoptRole;
+    
     getSensorData("Temperature", Payload, Success);
-    .print("Log: The newest value for temperature: " + Payload).
+    .print("Log: The newest value for temperature: " + Payload) ;
+    .print("Log: Mission completed.").
 
 +get_humidity(Room)[source(User)] : true <-
     .print("Log: Retrieve the humidity in ", Room, ".");
     !joinWorkspace(Room);
     !adoptRole;
+
     getSensorData("Humidity", Payload, Success);
-    .print("Log: The newest value for humidity: " + Payload).
+    .print("Log: The newest value for humidity: " + Payload) ;
+    .print("Log: Mission completed.").
 
 
 /* Receiving belief from a user to stop determining the temperature of a room.
@@ -64,7 +68,7 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 
 
 +notifyGroup(IsWellFormed)[source(Sender)] : true <-
-    .print("Log: Automation Agent is notified about the group change.").
+    .print("Log: Automation Agent is notified about the group change.");
 
 /*
  *
@@ -100,6 +104,9 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
     .print("Does not know RoleId and GroupId");
     .wait(5000);
     !adoptRole.
+
++!revokeRole : true <-
+    .print("Log: Role is revoked.").
 
 +!automate_telemetry(Mission, Scheme) : true <-
     .print(Mission, Scheme);

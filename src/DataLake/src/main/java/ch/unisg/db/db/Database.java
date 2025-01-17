@@ -28,4 +28,14 @@ public class Database implements dbUseCase {
     public HashMap<String, String> getAll() {
       return data;
     }
+
+    public String getTemperature(String key) {
+        final var fullData = data.get(key);
+        return fullData.split(",")[1];
+    }
+
+  public String getHumidity(String key) {
+    final var fullData = data.get(key);
+    return fullData.split(",")[2];
+  }
 }

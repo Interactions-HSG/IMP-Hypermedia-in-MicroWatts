@@ -19,7 +19,7 @@ public class HumidityController {
 
         HttpHeaders headers = new HttpHeaders();
 
-        return new ResponseEntity<>(database.get("humidity"), headers, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(database.getHumidity("room1"), headers, HttpStatus.ACCEPTED);
     }
 
     @PostMapping(path = "/humidity")

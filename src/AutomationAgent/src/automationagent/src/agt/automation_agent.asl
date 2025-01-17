@@ -22,22 +22,19 @@ groupWellFormed(false).
 2. Enter the workspace Room
  *
  */
-+get_temperatur(Room)[source(User)] : true <-
++!get_temperature(Room)[source(User)] : true <-
     .print("Log: Retrieve the temperature in ", Room, ".");
     !joinWorkspace(Room);
-    !adoptRole;
-    
-    getSensorData("Temperature", Payload, Success);
-    .print("Log: The newest value for temperature: " + Payload) ;
-    .print("Log: Mission completed.").
+    !adoptRole.
 
-+get_humidity(Room)[source(User)] : true <-
+
++!get_humidity(Room)[source(User)] : true <-
     .print("Log: Retrieve the humidity in ", Room, ".");
     !joinWorkspace(Room);
     !adoptRole;
 
     getSensorData("Humidity", Payload, Success);
-    .print("Log: The newest value for humidity: " + Payload) ;
+    .print("Log: The newest value for humidity: ", Payload) ;
     .print("Log: Mission completed.").
 
 
@@ -68,7 +65,7 @@ groupWellFormed(false).
 
 
 +notifyGroup(IsWellFormed)[source(Sender)] : true <-
-    .print("Log: Automation Agent is notified about the group change.");
+    .print("Log: Automation Agent is notified about the group change.").
 
 /*
  *
@@ -111,7 +108,15 @@ groupWellFormed(false).
 +!automate_telemetry(Mission, Scheme) : true <-
     .print(Mission, Scheme);
     commitToMission(Mission, Scheme, "automate_telemetry", Success);
-    .print("It works.").
+    .wait(5000); // wait to ensure sensing agent also receives the mission
+    !start_loop.
+
++!start_loop : true <-
+    .print("Log: Start loop.");
+    .wait(5000);
+    getSensorData("Temperature", Payload, Success);
+    .print("Log: The newest value for temperature: ", Payload) ;
+    !start_loop.
 
 { include("$jacamo/templates/common-cartago.asl") }
 { include("$jacamo/templates/common-moise.asl") }

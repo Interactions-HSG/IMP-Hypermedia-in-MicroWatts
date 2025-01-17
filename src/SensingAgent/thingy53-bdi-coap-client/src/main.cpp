@@ -50,11 +50,11 @@ int32_t agent_period = DEFAULT_AGENT_PERIOD;
 /**************************************************************************************************
   Global Variables.
 **************************************************************************************************/
-const char *ENTRYPOINT = "fd54:d167:b555:2:0:0:c0a8:c2"; //fd4b:a8d1:ad71:211:0:ff:fe00:fc11
+const char *ENTRYPOINT = "fd54:d167:b555:2:0:0:c0a8:75"; //fd4b:a8d1:ad71:211:0:ff:fe00:fc11
 char AGENT_URI[180];
 static const int YGGDRASIL_PORT = 5683;
-int DATALAKE_PORT = 5685;
-int ORGMANAGER_PORT = 5686;
+int DATALAKE_PORT;
+int ORGMANAGER_PORT;
 static const char *const MY_WORKSPACE = "room1";
 static const char *const ROOT_WORKSPACE = "root";
 static const char *const DATALAKE = "datalake";
@@ -457,6 +457,7 @@ int main(void)
 
 	
 	LOG_INF("Initializing coap client %d",1);
+	LOG_INF("Entrypoint is: %s", ENTRYPOINT);
 	CoapClient::initialize();
 	dk_set_led_on(BLUE_LED);
 	k_sleep(K_MSEC(10000));
@@ -464,8 +465,6 @@ int main(void)
 	dk_set_led_off(RED_LED);
 	dk_set_led_off(GREEN_LED);
 
-	#if defined(CONFIG_THINGY_LOW_POWER)
-	// low_power_enable();
-	#endif
+
 	
 }

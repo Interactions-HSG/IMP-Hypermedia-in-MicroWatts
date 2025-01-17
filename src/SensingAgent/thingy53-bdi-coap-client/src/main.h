@@ -32,12 +32,6 @@
 /**************************************************************************************************
   Task include files.
 **************************************************************************************************/
-/**************************** Embedded BDI Agent ****************************/
-#ifdef USE_EMB_BDI
-#include "agent/agent.h"
-#include "mas-abstractions/agent/bdi-agent/configuration.h"
-#include "mas-abstractions/agent/bdi-agent/functions.h"
-#endif
 /****************************************************************************/
 
 #include <coap_server_client_interface.h>

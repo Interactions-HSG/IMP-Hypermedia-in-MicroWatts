@@ -29,6 +29,16 @@ static bool FOUND_DB = false;
 static bool FOUND_OMI = false;
 static bool ROLE_AVAILABLE = false;
 
+
+
+static void adopt_role() {
+	otCoapType requestType = otCoapType::OT_COAP_TYPE_CONFIRMABLE;
+	otCoapCode requestCode = otCoapCode::OT_COAP_CODE_POST;
+	std::string payload = "{\"agentId\":\"" + std::string(AGENT_URI) + "\", \"groupId\":\"room1\", \"roleId\":\"sensing_agent\"}";
+	CoapClient::sendRequest(ENTRYPOINT, MY_WORKSPACE,ORGMANAGER_PORT, EMPTY_STRING, payload.c_str(), requestType , requestCode, 1, &ctx_adopt_role);
+}
+
+
 /**************************************************************************************************
   COMMIT TO MISSON AND SEND DATA - CTX 10
 **************************************************************************************************/
@@ -152,6 +162,9 @@ static void handleGetGoalsResponse(char *payload, uint16_t length)
         {
             GROUP_WELL_FORMED = false;
             COMMITTED_TO_MISSION = false;
+            if (!ADOPTED_ROLE) {
+                adopt_role();
+            }
         }
     }
 

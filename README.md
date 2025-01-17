@@ -14,100 +14,41 @@ only will using an agent based approach make the system more robust and flexible
 If you run the docker compose file you will see that some services will be created. It will spin up an instance of yggdrasil,
 that will enable the hypermedia driven capabilities. The other services will also be started and do their initial setup.
 The OrgManager and Datalake will create an artifact in the root workspace of yggdrasil. This will enable other agents to find
-the endpoints that are of interest to them. The SensingAgent for example looks for the datalake service and tries to find the
-endpoint where it can send its data to. Additionally it will join the workspace that represents the room in the building where
-it has been placed.
+the endpoints that are of interest to them. Sensing agent will have to be started seperately as they require dedicated hardware.
+If started the sensing agents will join the room they belief to be in (room1). They will try to adopt a fitting role and just 
+sleep until a change happens. To simulate user driven data demand / adhoc demand, send a post request to the automation agent. 
+This will proc the automation agent to also join the workspace and adopt the proper role, making the group well-formed. This will
+cause the sensing agents to realize that they need to start send data. In the end you will receive the current temperature data, s
+showing that the system works. It can be further demonstrated by adding a second sensing agent and in the middle of task completion
+turning the participating sensor off, the system will then adapt and continue to work, by using the other sensor.
 
-## ROADMAP
-The rough steps to make this project a success
+! Please check if the ip address used lines up with your setup. There is only one ip address that needs to be correct and it can
+be found in the sensings agents source code. In the main file there is an entrypoint string, make sure this lines up with the ip address of the computer running the docker containers.
+Additionally if running multiple Thingy53s adjust the agent id in the main.h file to be unique.
 
-- [x] Finish setting up the embedded systems development environment
-- [x] Implement rudimentary Sensing Agent that can find datalake at runtime
-- [ ] Implement rudimentary Sensing Agent that dynamically registers itself with the organisation
-- [ ] Implement Organisation Manager that adds itself to the Yggdrasil instance so it may be found
-- [x] Implement coAP functionality in Yggdrasil
-- [x] Sensing Agent joins his workspace, metadata that describes the agent is added.
-- [ ] Increase complexity of embedded bdi agents
-- [ ] Whole system dynamic and operable
-- [ ] Add demos that illustrate flexibility and robustness of chosen architecture
+### Start docker container
+```bash
+docker-compose up
+```
 
+### Create the workspace 'room1'
+```bash
+curl --location --request POST 'http://localhost:8080/workspaces/' \
+--header 'X-Agent-WebID: http://localhost:8081' \
+--header 'Slug: room1' \
+--header 'Content-Type: text/turtle' \
+--data ''
+```
 
-### Yggdrasil TO-DOs
-- [x] Set up new vertx verticle that acts as coAP server
-- [x] Functionality shoud be same as over HTTP (restricted)
-- [x] Add functionality to expand #platform representation so that e.g. orgManager is easily found -> Root level workspace (later .well-known endpoint)
+With this the workspace 'room1' is created and the agents can join it. The Organization manager will automatically update the groups if needed.
 
-### Yggdrasil Roadblocks
-- [ ] What to do with base uri ? If coAP agent disregards base Uri and just uses the paths it works. 
-But that would mean that the agent cannot take the actual uris advertised in the representations.
--> Create both representations in yggdrasil. Coap representations could not advertise HTTP methods.
-- [x] How should request payloads look like? /join uses http headers -> coap has options. Currently using 500 and 600
-- [ ] Should we add another representation factory that gives tds specifically for coap?
-
-
-### loose ideas
-- Yggdrasil doesnt need much added complexity except for coAP and custom #platform representation. The additional services such as orgManager and GraphDB / digital twins should all be standalone software that can register themselves on Yggdrasil through creating an artifact of themselves in the wanted workspace.
-- Only hardcoded URI should be the entrypoint to yggdrasil (Digital Twin could be found through yggdrasil as well technically)
-- Without digital twin embedded agent would register itself directly -> create a digital Artifact that has minimal initialization params so that the embedded agent does not need to send the entire graph string that is its own representation. OR simply set different rules for makingArtifact with coAP where we do not need a specialised artifact
-- BLE Beacon to be used for location tracking of embedded agents. Could be used in order to enable easy moving of agents between different locations.
-- Using the Agent body artifact to expose signifiers that point to the location of Data storage. There could be one central DB service that exposes a query endpoint and the agents would point to that endpoint, with each agent indicating in their representation what parameters must be used on the query endpoint to get the data they have stored.
-- Could have a program sitting in network that listens for new devices joining and sends them location of yggdrasil endpoint -> requires a set endpoint for the agents to receive the yggdrasil endpoint -> like .well-known
-- Could have a program that listens for new devices joining and sends them the location of the orgManager -> requires a set endpoint for the agents to receive the orgManager endpoint -> like .well-known -> would enable no hardcoding of even entrypoint
-
-
-embedded device:
-
-startup
--> connect thread network
-
-( ble get entrypoint )
-( room hardcoded )
-
--> /root/artifacts/
-
--> /root/artifacts/orgManager
--> /root/artifacts/datalake
-
-OrgManagerlogic:
--> join org
-
--> join group ( room )
--> get roles
--> evaluates roles
--> adopt a role
-
--> send measurements ( either immediately or upon group well-formed )
-
--> quit roles
-
-
-Full logic - Constrained Sensing Agent:
--> join workspace ( room )
-
-<- groupname groupid ( room )
-
--> join group ( room )
-<- rollen ( room )
--> adopt role ( room )
-<- success ( room )
-
---- idle ---
-
-<- well-formed ( room )
--> send measurements ( room )
-
-<- not well-formed ( room )
--> stop sending measurements ( room )
-
---- out of power ---
--> quit workspaces ( room )
+### Send post request to automation agent
+This will initiate a request from the user to get the current temperature in the room.
+```bash
+curl --location 'localhost:8081/agents/bob/inbox' \
+--header 'Content-Type: application/json' \
+--data '{"performative":"tell","sender":"user-1","receiver":"bob","content":"get_temperature(room1)","msgId":"45"}'
+```
 
 
 
-++++ add to yggdrasil update messages of new / deleted devices the location header of the device
-
-
-### Assumptions for embedded device
-- give entry point to yggdrasil ( can also be done dynamically with ble)
-- important artifacts are always in the root workspace (makes it easier for demo)
-- names of artifacts & their actions are always the same (makes it easier for demo)

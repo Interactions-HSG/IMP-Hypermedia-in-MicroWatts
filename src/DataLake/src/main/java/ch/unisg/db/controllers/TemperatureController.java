@@ -13,20 +13,17 @@ public class TemperatureController {
 
     @GetMapping(path = "/temperature")
     public ResponseEntity<String> getTemperature() {
-
+        System.out.println("GET /temperature");
         HttpHeaders headers = new HttpHeaders();
 
-        return new ResponseEntity<>(database.get("temperature"), headers, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(database.getTemperature("room1"), headers, HttpStatus.ACCEPTED);
     }
 
     @PostMapping(path = "/temperature")
-    public ResponseEntity<String> postTemperature(@RequestBody String payload) {
-
-        String key = payload.split(",")[0];
-        database.put(key, payload);
-
+    public ResponseEntity<String> postTemperature() {
+        System.out.println("GET /temperature");
         HttpHeaders headers = new HttpHeaders();
 
-        return new ResponseEntity<>(headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(database.getTemperature("room1"), headers, HttpStatus.ACCEPTED);
     }
 }

@@ -365,7 +365,7 @@ public class HttpClientArtifact extends Artifact{
                     // Execute the request
                     TDHttpResponse response = request.execute();
 
-                    if (response.getStatusCode() == 201) {
+                    if (response.getStatusCode() == 200) {
                         System.out.println("Log: Commitment to mission was successful");
                     } else {
                         System.out.println("Log: Commitment to mission was not successful");
@@ -388,5 +388,49 @@ public class HttpClientArtifact extends Artifact{
             e.printStackTrace();
         }
     }
+
+    /*
+     */
+    @OPERATION
+    public void getSensorData(String type, OpFeedbackParam<String> response, OpFeedbackParam<Boolean> success) {
+        try {
+            // Retrieve the Thing Description (TD) for the specified OMI
+            ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, DB);
+
+            // Retrieve the "commitToMission" action from the TD
+            Optional<ActionAffordance> action = td.getActionByName("get" + type);
+
+            // Check if the action is present
+            if (action.isPresent()) {
+
+                // Create a request for the action using the first available form
+                TDHttpRequest request = new TDHttpRequest(
+                    action.get().getFirstFormForSubProtocol(TD.readProperty, "http").orElseThrow(),
+                    TD.readProperty
+                );
+
+                // Add necessary headers to the request
+                request.addHeader("Slug", SLUG);
+                request.addHeader("X-Agent-WebID", WEBID);
+
+                // Retrieve the input schema for the action
+                Optional<DataSchema> inputScheme = action.get().getInputSchema();
+
+                // Execute the request
+                TDHttpResponse r = request.execute();
+                success.set(true);
+                response.set(r.getPayload().get());
+
+            } else {
+
+                success.set(false);
+                System.out.println("Action not found.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

@@ -1,4 +1,4 @@
-# Official Gradle image 
+# Official Gradle image
 FROM gradle AS builder
 
 # Set the working directory inside the container

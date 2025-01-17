@@ -33,7 +33,8 @@
         td:hasForm [
             htv:methodName "GET" ;
             hctl:hasTarget <http://datalake:7600/temperature> ;
-            hctl:hasOperationType td:invokeAction
+            hctl:hasOperationType td:readProperty;
+            hctl:forSubProtocol "http"
         ];
     ], [ a td:ActionAffordance;
         td:name "getHumidity";

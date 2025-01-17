@@ -160,7 +160,7 @@ bool MeasurementBuffer::isFull()
 	return (fillLevel >= bufferSize);
 }
 std::string MeasurementBuffer::getTransmissionData(std::string agent_id){
-	std::string transmission_string = agent_id + ",temperature:" + double_to_string(getAvgTemperature()) + "," +
+	std::string transmission_string = std::string("room1") + ",temperature:" + double_to_string(getAvgTemperature()) + "," +
 									  "humidity:" + double_to_string(getAvgHumidity()) + "," +
 									  "air_pressure:" + double_to_string(getAvgAirPressure()) + "," +
 									  "gas_resolution:" + std::to_string(getAvgGasResolution());

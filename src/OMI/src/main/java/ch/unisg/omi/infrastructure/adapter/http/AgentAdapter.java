@@ -165,23 +165,6 @@ public class AgentAdapter implements AgentPort {
     }
 
     @Override
-    public void notifyGoal(OEAgent agentId, Goal goal, String groupId, Mission mission, SchemeInstance schemeInstance) {
-
-        var group = (GroupResource) server.getRoot().getChild(groupId);
-
-        LOGGER.info("notifyGoal: " + goal.getId() + mission.getId() + schemeInstance.getId());
-
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("goalId", goal.getId());
-        hashMap.put("missionId", mission.getId());
-        hashMap.put("schemeId", schemeInstance.getId());
-
-        group.addGoal(hashMap);
-
-        group.notifyResource(true);
-    }
-
-    @Override
     public void notifyGoal(List<Broadcaster.PlayerInfo> playerInfos) {
         var group = (GroupResource) server.getRoot().getChild(playerInfos.getFirst().groupId());
 
@@ -200,8 +183,51 @@ public class AgentAdapter implements AgentPort {
     @Override
     public void notifyGroup(OEAgent agent, String groupId) {
         LOGGER.info("notifyGroup: " + groupId);
+
+        /* Update group resource to notify CoAP clients */
         var group = (GroupResource) server.getRoot().getChild(groupId);
         group.notifyResource(false);
+
+        /* Notify */
+
+        try {
+            ThingDescription td = TDGraphReader.readFromURL(ThingDescription.TDFormat.RDF_TURTLE, agent.getId());
+
+            Optional<ActionAffordance> action = td.getActionByName("advertiseMessage");
+
+            if (action.isPresent()) {
+                TDHttpRequest request = new TDHttpRequest(
+                        action.get().getFirstForm().orElseThrow(),
+                        TD.invokeAction
+                );
+
+                request.addHeader("Slug", "omi");
+                request.addHeader("X-Agent-WebID", "http://omi:7500/workspaces/root/artifacts/omi");
+
+                Optional<DataSchema> inputSchema = action.get().getInputSchema();
+
+                if (inputSchema.isPresent()) {
+
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("performative", "achieve");
+                    payload.put("sender", "omi");
+                    payload.put("receiver", "bob");
+                    payload.put("content", String.format("%s(%b)", "notifyGroup", false));
+                    payload.put("msgId", "3");
+
+                    request.setObjectPayload((ObjectSchema) inputSchema.get(), payload);
+
+                    TDHttpResponse response = request.execute();
+
+                    LOGGER.info("Status code: " + response.getStatusCode());
+                } else {
+                    LOGGER.info("Input schema not found.");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error sending goal", e);
+        }
+
     }
 
     @Override

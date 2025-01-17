@@ -66,6 +66,11 @@
             <artifactId>jsonld-java</artifactId>
             <version>0.13.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
 
     </dependencies>

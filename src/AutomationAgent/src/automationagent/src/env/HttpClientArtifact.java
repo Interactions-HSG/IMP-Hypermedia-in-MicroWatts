@@ -30,6 +30,7 @@ public class HttpClientArtifact extends Artifact{
     private static String ENTRYPOINT = "http://yggdrasil:8080/";
     private static String WEBID = "http://yggdrasil:8080/workspaces/room1/artifacts/AutomationAgent";
     private static String OMI = "http://yggdrasil:8080/workspaces/root/artifacts/omi";
+    private static String DB = "http://yggdrasil:8080/workspaces/root/artifacts/datalake";
 
     void init(){}
 

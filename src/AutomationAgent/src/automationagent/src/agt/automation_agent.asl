@@ -3,6 +3,8 @@ role(automation_agent).
 
 hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 
+groupWellFormed(false).
+
 /* Initial goals */
 
 !start.
@@ -20,31 +22,53 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
 2. Enter the workspace Room
  *
  */
-+get_telemetry(Room)[source(User)] : true <-
-    .print("Log: Measure the temperature in ", Room, ".");
++get_temperatur(Room)[source(User)] : true <-
+    .print("Log: Retrieve the temperature in ", Room, ".");
     !joinWorkspace(Room);
-    !adoptRole.
+    !adoptRole;
+    
+    getSensorData("Temperature", Payload, Success);
+    .print("Log: The newest value for temperature: " + Payload) ;
+    .print("Log: Mission completed.").
+
++get_humidity(Room)[source(User)] : true <-
+    .print("Log: Retrieve the humidity in ", Room, ".");
+    !joinWorkspace(Room);
+    !adoptRole;
+
+    getSensorData("Humidity", Payload, Success);
+    .print("Log: The newest value for humidity: " + Payload) ;
+    .print("Log: Mission completed.").
+
 
 /* Receiving belief from a user to stop determining the temperature of a room.
  *
  */
-+stop_telemetry(Room)[source(User)] : true <-
-    .print("Log: Stop the temperature measurement in ", Room, ".");
+-stop_temperature(Room)[source(User)] : true <-
+    .print("Log: Stop receiving temperature in ", Room, ".");
+    !leaveWorkspace(Room).
+
+-stop_humidty(Room)[source(User)] : true <-
+    .print("Log: Stop receiving humidity in ", Room, ".");
     !leaveWorkspace(Room).
 
 /* Receiving belief from the OMI to join a group
  * 
  */
-+group(GroupName)[source(OMI)] : true <- 
-    .print("Log: New group ", GroupName, " received from ", OMI, ".").
++group(GroupName)[source(Sender)] : true <- 
+    .print("Log: New group ", GroupName, " received from ", Sender, ".").
     
 
 /* Receiving belief from the OMI to exit a group
  *
  */
--group(GroupName)[source(OMI)] : true <-
-    .print("Log: Leave group ", GroupName, " received from ", OMI, ".");
+-group(GroupName)[source(Sender)] : true <-
+    .print("Log: Leave group ", GroupName, " received from ", Sender, ".");
     !leaveOmiGroup(GroupName).
+
+
++notifyGroup(IsWellFormed)[source(Sender)] : true <-
+    .print("Log: Automation Agent is notified about the group change.");
 
 /*
  *
@@ -80,6 +104,9 @@ hasRole(Role) :- role(Role) & roles(Roles) & .member(Role, Roles).
     .print("Does not know RoleId and GroupId");
     .wait(5000);
     !adoptRole.
+
++!revokeRole : true <-
+    .print("Log: Role is revoked.").
 
 +!automate_telemetry(Mission, Scheme) : true <-
     .print(Mission, Scheme);
